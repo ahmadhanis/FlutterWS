@@ -50,11 +50,12 @@ class _ProgressIndicatorState extends State<ProgressIndicator>
         setState(() {
           if (animation.value > 0.9) {
             Navigator.pushReplacement(
-                context, MaterialPageRoute(builder: (context) => LoginPage()));
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext context) => LoginPage()));
           }
         });
       });
-
     controller.repeat();
   }
 
