@@ -6,6 +6,9 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'loginpage.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 
 List<CameraDescription> cameras;
 String pathAsset = 'assets/images/profile.png';
@@ -18,6 +21,8 @@ class RegisterUser extends StatefulWidget {
 }
 
 class _RegisterUserState extends State<RegisterUser> {
+  String urlUpload = "http://slumberjer.com/foodninja/upload_image.php";
+
   @override
   void initState() {
     super.initState();
@@ -39,7 +44,7 @@ class _RegisterUserState extends State<RegisterUser> {
             child: Column(
               children: <Widget>[
                 GestureDetector(
-                    onTap: _onCamera,
+                    onTap: _choose,
                     child: Container(
                       width: 190,
                       height: 190,
@@ -97,9 +102,19 @@ class _RegisterUserState extends State<RegisterUser> {
     );
   }
 
+  void _choose() async {
+    _image = await ImagePicker.pickImage(source: ImageSource.camera);
+    setState(() {
+      
+    });
+    
+// file = await ImagePicker.pickImage(source: ImageSource.gallery);
+  }
+
   void _onRegister() {
     print('onRegister Button from RegisterUser()');
     print(_image.toString());
+    uploadImage();
   }
 
   void _onBackPress() {
@@ -107,6 +122,20 @@ class _RegisterUserState extends State<RegisterUser> {
     print('onBackpress from RegisterUser');
     Navigator.pushReplacement(context,
         MaterialPageRoute(builder: (BuildContext context) => LoginPage()));
+  }
+
+  void uploadImage() {
+    if (_image == null) return;
+    String base64Image = base64Encode(_image.readAsBytesSync());
+    String fileName = 'newprofile.png';
+    http.post(urlUpload, body: {
+      "image": base64Image,
+      "name": fileName,
+    }).then((res) {
+      print(res.statusCode);
+    }).catchError((err) {
+      print(err);
+    });
   }
 
   void _onCamera() async {
@@ -146,6 +175,8 @@ class TakePictureScreen extends StatefulWidget {
 class TakePictureScreenState extends State<TakePictureScreen> {
   CameraController _controller;
   Future<void> _initializeControllerFuture;
+
+  String urlUpload = 'http://slumberjer.com/foodninja/upload_image.php';
 
   @override
   void initState() {
