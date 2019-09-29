@@ -29,7 +29,7 @@ dev_dependencies:
     sdk: flutter
   shared_preferences: ^0.5.3+4
   toast: ^0.1.5
-
+  image_picker:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

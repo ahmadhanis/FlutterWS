@@ -10,6 +10,8 @@ import 'package:toast/toast.dart';
 
 String pathAsset = 'assets/images/profile.png';
 File _image;
+String urlUpload = "http://slumberjer.com/foodninja/upload_image.php";
+
 final TextEditingController _emcontroller = TextEditingController();
 final TextEditingController _passcontroller = TextEditingController();
 final TextEditingController _phcontroller = TextEditingController();
@@ -21,8 +23,6 @@ class RegisterUser extends StatefulWidget {
 }
 
 class _RegisterUserState extends State<RegisterUser> {
-  String urlUpload = "http://slumberjer.com/foodninja/upload_image.php";
-
   @override
   void initState() {
     super.initState();
@@ -30,7 +30,44 @@ class _RegisterUserState extends State<RegisterUser> {
 
   @override
   Widget build(BuildContext context) {
-    var column = Column(
+    return WillPopScope(
+      onWillPop: _onBackPressAppBar,
+      child: Scaffold(
+        resizeToAvoidBottomPadding: false,
+        appBar: AppBar(
+          title: Text('New User Registration'),
+          backgroundColor: Colors.black,
+        ),
+        body: SingleChildScrollView(
+          child: Container(
+            padding: EdgeInsets.fromLTRB(40, 20, 40, 20),
+            child: RegisterWidget(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<bool> _onBackPressAppBar() async {
+    _image = null;
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LoginPage(),
+        ));
+    return Future.value(false);
+  }
+}
+
+class RegisterWidget extends StatefulWidget {
+  @override
+  _RegisterWidgetState createState() => _RegisterWidgetState();
+}
+
+class _RegisterWidgetState extends State<RegisterWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
       children: <Widget>[
         GestureDetector(
             onTap: _choose,
@@ -87,22 +124,6 @@ class _RegisterUserState extends State<RegisterUser> {
             child: Text('Already Register', style: TextStyle(fontSize: 16))),
       ],
     );
-    return WillPopScope(
-      onWillPop: _onBackPressAppBar,
-      child: Scaffold(
-        resizeToAvoidBottomPadding: false,
-        appBar: AppBar(
-          title: Text('New User Registration'),
-          backgroundColor: Colors.black,
-        ),
-        body: SingleChildScrollView(
-          child: Container(
-            padding: EdgeInsets.fromLTRB(40, 20, 40, 20),
-            child: column,
-          ),
-        ),
-      ),
-    );
   }
 
   void _choose() async {
@@ -145,15 +166,5 @@ class _RegisterUserState extends State<RegisterUser> {
     }).catchError((err) {
       print(err);
     });
-  }
-
-  Future<bool> _onBackPressAppBar() async {
-    _image = null;
-    Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => LoginPage(),
-        ));
-    return Future.value(false);
   }
 }
