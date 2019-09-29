@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 bool _isChecked = true;
 final TextEditingController _emcontroller = TextEditingController();
-  String _email = "";
-  final TextEditingController _pscontroller = TextEditingController();
-  String _pass = "";
+String _email = "";
+final TextEditingController _pscontroller = TextEditingController();
+String _pass = "";
 
 class LoginPage extends StatefulWidget {
   @override
@@ -12,6 +13,12 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  @override
+  void initState() {
+    _loadpref();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -26,10 +33,10 @@ class _LoginPageState extends State<LoginPage> {
               scale: 2.5,
             ),
             TextField(
-              controller: _emcontroller,
+                controller: _emcontroller,
                 decoration: InputDecoration(
-              labelText: 'Email',
-            )),
+                  labelText: 'Email',
+                )),
             TextField(
               controller: _pscontroller,
               decoration: InputDecoration(
@@ -79,13 +86,74 @@ class _LoginPageState extends State<LoginPage> {
   void _onPress() {
     print(_emcontroller.text);
     print(_pscontroller.text);
+    if (_checkEmail(_emcontroller.text)) {
+      return;
+    } else {
+      print("Success Login");
+    }
   }
 
   void _onChange(bool value) {
     setState(() {
-     _isChecked = value; 
-     print('Check value $value');
+      _isChecked = value;
+      print('Check value $value');
+      _savePref(value);
     });
+  }
 
+  bool _checkEmail(String email) {
+    bool emailValid =
+        RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(email);
+    return emailValid;
+  }
+
+  void _savePref(bool value) async {
+    print('Inside loadpref()');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _email = _emcontroller.text;
+    _pass = _pscontroller.text;
+    if (value) {
+      if (_checkEmail(_email)) {
+        //Store value in pref
+        await prefs.setString('email', _email);
+        await prefs.setString('pass', _pass);
+        print('Pref Stored');
+      } else {
+        print('email invalid!!!');
+        setState(() {
+          _isChecked = false;
+        });
+      }
+    } else {
+      //Remove value from pref
+       await prefs.setString('email', '');
+       await prefs.setString('pass', '');
+      setState(() {
+        _emcontroller.text = '';
+        _pscontroller.text = '';
+        _isChecked = false;
+      });
+      print('pref removed');
+    }
+  }
+
+  void _loadpref() async{
+    print('inside loadpref');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _email = (prefs.getString('email'));
+    _pass = (prefs.getString('pass'));
+    print(_email);
+    print(_pass);
+    if (_email.length>1){
+      _emcontroller.text = _email;
+      _pscontroller.text = _pass;
+      setState(() {
+        _isChecked = true;
+      });
+    }else{
+      setState(() {
+        _isChecked = false;
+      });
+    }
   }
 }
