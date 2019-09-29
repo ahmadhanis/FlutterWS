@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:my_helper/registrationscreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:toast/toast.dart';
 
 bool _isChecked = true;
 final TextEditingController _emcontroller = TextEditingController();
@@ -72,7 +74,10 @@ class _LoginPageState extends State<LoginPage> {
             SizedBox(
               height: 20,
             ),
-            Text("Register new account"),
+            GestureDetector(
+                onTap: _onRegister,
+                child: Text('Register New Account',
+                    style: TextStyle(fontSize: 16))),
             SizedBox(
               height: 10,
             ),
@@ -118,6 +123,8 @@ class _LoginPageState extends State<LoginPage> {
         await prefs.setString('email', _email);
         await prefs.setString('pass', _pass);
         print('Pref Stored');
+        Toast.show("Preferences has been saved", context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       } else {
         print('email invalid!!!');
         setState(() {
@@ -126,34 +133,42 @@ class _LoginPageState extends State<LoginPage> {
       }
     } else {
       //Remove value from pref
-       await prefs.setString('email', '');
-       await prefs.setString('pass', '');
+      await prefs.setString('email', '');
+      await prefs.setString('pass', '');
       setState(() {
         _emcontroller.text = '';
         _pscontroller.text = '';
         _isChecked = false;
       });
       print('pref removed');
+      Toast.show("Preferences has been removed", context,
+          duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
     }
   }
 
-  void _loadpref() async{
+  void _loadpref() async {
     print('inside loadpref');
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _email = (prefs.getString('email'));
     _pass = (prefs.getString('pass'));
     print(_email);
     print(_pass);
-    if (_email.length>1){
+    if (_email.length > 1) {
       _emcontroller.text = _email;
       _pscontroller.text = _pass;
       setState(() {
         _isChecked = true;
       });
-    }else{
+    } else {
       setState(() {
         _isChecked = false;
       });
     }
+  }
+
+  void _onRegister() {
+    print('_onRegister()');
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => MyRegistration()));
   }
 }
