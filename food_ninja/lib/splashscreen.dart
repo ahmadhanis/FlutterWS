@@ -7,6 +7,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: new ThemeData(
+          primarySwatch: Colors.red),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: Center(
@@ -48,7 +50,7 @@ class _ProgressIndicatorState extends State<ProgressIndicator>
     animation = Tween(begin: 0.0, end: 1.0).animate(controller)
       ..addListener(() {
         setState(() {
-          if (animation.value > 0.9) {
+          if (animation.value > 0.99) {
             Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(

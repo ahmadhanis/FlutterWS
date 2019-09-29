@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:food_ninja/mainlayout.dart';
 import 'package:food_ninja/registeruser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -8,10 +9,8 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
-      title: 'Login',
-      theme: new ThemeData(primarySwatch: Colors.red),
-      home: new LoginPage(),
+    return MaterialApp(
+      home: LoginPage(),
     );
   }
 }
@@ -55,13 +54,11 @@ class _LoginPageState extends State<LoginPage> {
                     controller: _emcontroller,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
-                      labelText: 'Email',
-                    )),
+                        labelText: 'Email', icon: Icon(Icons.email))),
                 TextField(
                   controller: _pscontroller,
                   decoration: InputDecoration(
-                    labelText: 'Password',
-                  ),
+                      labelText: 'Password', icon: Icon(Icons.lock)),
                   obscureText: true,
                 ),
                 SizedBox(
@@ -111,6 +108,12 @@ class _LoginPageState extends State<LoginPage> {
 
   void _onPress() {
     print('Press');
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => MainLayout(
+                  status: null,
+                )));
   }
 
   void _onRegister() {
