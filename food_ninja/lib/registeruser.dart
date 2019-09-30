@@ -15,6 +15,7 @@ String urlUpload = "http://slumberjer.com/foodninja/upload_image.php";
 final TextEditingController _emcontroller = TextEditingController();
 final TextEditingController _passcontroller = TextEditingController();
 final TextEditingController _phcontroller = TextEditingController();
+String _email, _password, _phone;
 
 class RegisterUser extends StatefulWidget {
   @override
@@ -83,7 +84,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                     fit: BoxFit.fill,
                   )),
             )),
-        Text('Click on image above to take profile picture'),
+        Text('Click on the image above to take profile picture'),
         TextField(
             controller: _emcontroller,
             keyboardType: TextInputType.emailAddress,
@@ -146,25 +147,43 @@ class _RegisterWidgetState extends State<RegisterWidget> {
   }
 
   void uploadData() {
-    if (_image == null) {
-      Toast.show("No Image", context,
+    _email = _emcontroller.text;
+    _password = _passcontroller.text;
+    _phone = _phcontroller.text;
+    print(_image);
+    if ((_image == null) ||
+        (!_isEmailValid(_email)) ||
+        (_password.length < 5) ||
+        (_phone.length < 5)) {
+      Toast.show("Invalid Registration Data", context,
           duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
       return;
     }
     String base64Image = base64Encode(_image.readAsBytesSync());
-    String fileName = 'newprofile.png';
+    String fileName = _email + '.jpg';
     http.post(urlUpload, body: {
       "image": base64Image,
       "name": fileName,
-      "email": _emcontroller.text,
-      "pass": _passcontroller.text,
-      "phone": _phcontroller.text,
+      "email": _email,
+      "pass": _password,
+      "phone": _phone,
     }).then((res) {
       print(res.statusCode);
       Toast.show("Success", context,
           duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
+      _image = null;
+      _emcontroller.text = '';
+      _phcontroller.text = '';
+      _passcontroller.text = '';
+
+      Navigator.pushReplacement(context,
+          MaterialPageRoute(builder: (BuildContext context) => LoginPage()));
     }).catchError((err) {
       print(err);
     });
+  }
+
+  bool _isEmailValid(String email) {
+    return RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(email);
   }
 }

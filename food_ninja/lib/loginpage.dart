@@ -3,17 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:food_ninja/mainlayout.dart';
 import 'package:food_ninja/registeruser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-void main() => runApp(MyApp());
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: LoginPage(),
-    );
-  }
-}
+import 'package:toast/toast.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -156,24 +146,25 @@ class _LoginPageState extends State<LoginPage> {
 
   void savepref(bool value) async {
     print('Inside savepref');
-    setState(() {
-      _email = _emcontroller.text;
-      _pass = _pscontroller.text;
-    });
-
+    _email = _emcontroller.text;
+    _pass = _pscontroller.text;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (value) {
       //true save pref
-      if (_emcontroller.text.length > 1) {
+      if (_isEmailValid(_email) || _pass.length < 5) {
         await prefs.setString('email', _email);
         await prefs.setString('pass', _pass);
         print('Save pref $_email');
         print('Save pref $_pass');
+        Toast.show("Preferences saved succesfully", context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       } else {
         print('No email');
         setState(() {
           _isChecked = false;
         });
+        Toast.show("Invalid Preferences", context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       }
     } else {
       await prefs.setString('email', '');
@@ -184,6 +175,8 @@ class _LoginPageState extends State<LoginPage> {
         _isChecked = false;
       });
       print('Remove pref');
+      Toast.show("Preferences removed", context,
+          duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
     }
   }
 
@@ -191,5 +184,9 @@ class _LoginPageState extends State<LoginPage> {
     SystemNavigator.pop();
     print('Backpress');
     return Future.value(false);
+  }
+
+  bool _isEmailValid(String email) {
+    return RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(email);
   }
 }
