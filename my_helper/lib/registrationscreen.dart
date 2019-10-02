@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -5,12 +6,17 @@ import 'package:flutter/services.dart';
 import 'package:my_helper/loginscreen.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:toast/toast.dart';
+import 'package:http/http.dart' as http;
 
 String pathAsset = 'assets/images/profile.png';
+String urlUpload =
+    "http://slumberjer.000webhostapp.com/myhelper/php/upload_image.php";
 File _image;
+final TextEditingController _namecontroller = TextEditingController();
 final TextEditingController _emcontroller = TextEditingController();
 final TextEditingController _passcontroller = TextEditingController();
 final TextEditingController _phcontroller = TextEditingController();
+String _name, _email, _password, _phone;
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -88,6 +94,13 @@ class RegisterWidgetState extends State<RegisterWidget> {
               labelText: 'Email',
               icon: Icon(Icons.email),
             )),
+            TextField(
+            controller: _namecontroller,
+            keyboardType: TextInputType.text,
+            decoration: InputDecoration(
+              labelText: 'Name',
+              icon: Icon(Icons.person),
+            )),
         TextField(
           controller: _passcontroller,
           decoration:
@@ -124,9 +137,9 @@ class RegisterWidgetState extends State<RegisterWidget> {
   }
 
   void _choose() async {
-     _image = await ImagePicker.pickImage(source: ImageSource.camera);
+    _image = await ImagePicker.pickImage(source: ImageSource.camera);
     setState(() {});
-    // file = await ImagePicker.pickImage(source: ImageSource.gallery);
+    //_image = await ImagePicker.pickImage(source: ImageSource.gallery);
   }
 
   void _onRegister() {
@@ -142,7 +155,38 @@ class RegisterWidgetState extends State<RegisterWidget> {
         MaterialPageRoute(builder: (BuildContext context) => LoginPage()));
   }
 
-  void uploadData() {}
+  void uploadData() {
+    _email = _emcontroller.text;
+    _password = _passcontroller.text;
+    _phone = _phcontroller.text;
+    if ((_isEmailValid(_email)) && (_password.length > 5) && (_image != null)) {
+      String base64Image = base64Encode(_image.readAsBytesSync());
+      String fileName = _email + '.jpg';
+      http.post(urlUpload, body: {
+        "image": base64Image,
+        "name": fileName,
+        "email": _email,
+        "pass": _password,
+        "phone": _phone,
+      }).then((res) {
+        print(res.statusCode);
+        Toast.show("Success", context,
+            duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
+        _image = null;
+        _emcontroller.text = '';
+        _phcontroller.text = '';
+        _passcontroller.text = '';
+
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (BuildContext context) => LoginPage()));
+      }).catchError((err) {
+        print(err);
+      });
+    } else {
+      Toast.show("Check your email and password", context,
+          duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+    }
+  }
 
   bool _isEmailValid(String email) {
     return RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(email);
