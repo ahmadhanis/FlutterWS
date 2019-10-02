@@ -29,6 +29,9 @@ class _LoginPageState extends State<LoginPage> {
     return WillPopScope(
         onWillPop: _onBackPressAppBar,
         child: Scaffold(
+          appBar: AppBar(
+          title: Text('Login'),
+        ),
           resizeToAvoidBottomPadding: false,
           body: new Container(
             padding: EdgeInsets.all(30.0),

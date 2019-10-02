@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:my_helper/registrationscreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:toast/toast.dart';
 
 void main() => runApp(MyApp());
 
@@ -106,7 +107,6 @@ class _LoginPageState extends State<LoginPage> {
 
   void _onPress() {
     print('Press');
-    
   }
 
   void _onRegister() {
@@ -149,24 +149,25 @@ class _LoginPageState extends State<LoginPage> {
 
   void savepref(bool value) async {
     print('Inside savepref');
-    setState(() {
-      _email = _emcontroller.text;
-      _pass = _pscontroller.text;
-    });
-
+    _email = _emcontroller.text;
+    _pass = _pscontroller.text;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (value) {
       //true save pref
-      if (_emcontroller.text.length > 1) {
+      if (_isEmailValid(_email) && (_pass.length > 5)) {
         await prefs.setString('email', _email);
         await prefs.setString('pass', _pass);
         print('Save pref $_email');
         print('Save pref $_pass');
+        Toast.show("Preferences have been saved", context,
+            duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
       } else {
         print('No email');
         setState(() {
           _isChecked = false;
         });
+        Toast.show("Check your credentials", context,
+            duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
       }
     } else {
       await prefs.setString('email', '');
@@ -177,6 +178,8 @@ class _LoginPageState extends State<LoginPage> {
         _isChecked = false;
       });
       print('Remove pref');
+      Toast.show("Preferences have been removed", context,
+            duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
     }
   }
 
@@ -184,5 +187,9 @@ class _LoginPageState extends State<LoginPage> {
     SystemNavigator.pop();
     print('Backpress');
     return Future.value(false);
+  }
+
+  bool _isEmailValid(String email) {
+    return RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(email);
   }
 }

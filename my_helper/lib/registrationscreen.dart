@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:my_helper/loginscreen.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:toast/toast.dart';
 
 String pathAsset = 'assets/images/profile.png';
 File _image;
@@ -142,4 +143,8 @@ class RegisterWidgetState extends State<RegisterWidget> {
   }
 
   void uploadData() {}
+
+  bool _isEmailValid(String email) {
+    return RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(email);
+  }
 }
