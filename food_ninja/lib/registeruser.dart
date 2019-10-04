@@ -7,15 +7,17 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:toast/toast.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 
 String pathAsset = 'assets/images/profile.png';
 File _image;
-String urlUpload = "http://slumberjer.com/foodninja/upload_image.php";
+String urlUpload = "http://slumberjer.com/foodninja/php/register_user.php";
 
+final TextEditingController _namecontroller = TextEditingController();
 final TextEditingController _emcontroller = TextEditingController();
 final TextEditingController _passcontroller = TextEditingController();
 final TextEditingController _phcontroller = TextEditingController();
-String _email, _password, _phone;
+String _email, _password, _phone,_name;
 
 class RegisterUser extends StatefulWidget {
   @override
@@ -86,6 +88,14 @@ class _RegisterWidgetState extends State<RegisterWidget> {
             )),
         Text('Click on the image above to take profile picture'),
         TextField(
+            controller: _namecontroller,
+            keyboardType: TextInputType.text,
+            decoration: InputDecoration(
+              labelText: 'Name',
+              icon: Icon(Icons.person),
+            )),
+
+        TextField(
             controller: _emcontroller,
             keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
@@ -147,6 +157,10 @@ class _RegisterWidgetState extends State<RegisterWidget> {
   }
 
   void uploadData() {
+    ProgressDialog pr = new ProgressDialog(context,type: ProgressDialogType.Normal, isDismissible: false);
+    pr.show();
+
+    _name = _namecontroller.text;
     _email = _emcontroller.text;
     _password = _passcontroller.text;
     _phone = _phcontroller.text;
@@ -160,27 +174,28 @@ class _RegisterWidgetState extends State<RegisterWidget> {
       return;
     }
     String base64Image = base64Encode(_image.readAsBytesSync());
-    String fileName = _email + '.jpg';
     http.post(urlUpload, body: {
-      "image": base64Image,
-      "name": fileName,
+      "encoded_string": base64Image,
+      "name": _name,
       "email": _email,
-      "pass": _password,
+      "password": _password,
       "phone": _phone,
     }).then((res) {
       print(res.statusCode);
-      Toast.show("Success", context,
-          duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
+      print(res.body);
       _image = null;
+      _namecontroller.text='';
       _emcontroller.text = '';
       _phcontroller.text = '';
       _passcontroller.text = '';
-
+      Toast.show(res.body, context,
+          duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       Navigator.pushReplacement(context,
           MaterialPageRoute(builder: (BuildContext context) => LoginPage()));
     }).catchError((err) {
       print(err);
     });
+    pr.dismiss();
   }
 
   bool _isEmailValid(String email) {
