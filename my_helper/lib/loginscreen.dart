@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:my_helper/mainscreen.dart';
 import 'package:my_helper/registrationscreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
+import 'package:http/http.dart' as http;
+import 'package:progress_dialog/progress_dialog.dart';
+
+String urlLogin = "http://slumberjer.com/myhelper/php/login_user.php";
 
 void main() => runApp(MyApp());
 
@@ -23,8 +28,8 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emcontroller = TextEditingController();
   String _email = "";
-  final TextEditingController _pscontroller = TextEditingController();
-  String _pass = "";
+  final TextEditingController _passcontroller = TextEditingController();
+  String _password = "";
   bool _isChecked = false;
 
   @override
@@ -55,7 +60,7 @@ class _LoginPageState extends State<LoginPage> {
                     decoration: InputDecoration(
                         labelText: 'Email', icon: Icon(Icons.email))),
                 TextField(
-                  controller: _pscontroller,
+                  controller: _passcontroller,
                   decoration: InputDecoration(
                       labelText: 'Password', icon: Icon(Icons.lock)),
                   obscureText: true,
@@ -72,7 +77,7 @@ class _LoginPageState extends State<LoginPage> {
                   color: Color.fromRGBO(159, 30, 99, 1),
                   textColor: Colors.white,
                   elevation: 15,
-                  onPressed: _onPress,
+                  onPressed: _onLogin,
                 ),
                 SizedBox(
                   height: 10,
@@ -105,8 +110,34 @@ class _LoginPageState extends State<LoginPage> {
         ));
   }
 
-  void _onPress() {
-    print('Press');
+  void _onLogin() {
+    _email = _emcontroller.text;
+    _password = _passcontroller.text;
+    if (_isEmailValid(_email) && (_password.length > 4)) {
+      ProgressDialog pr = new ProgressDialog(context,
+          type: ProgressDialogType.Normal, isDismissible: false);
+      pr.style(message: "Login in");
+      pr.show();
+      http.post(urlLogin, body: {
+        "email": _email,
+        "password": _password,
+      }).then((res) {
+        print(res.statusCode);
+        Toast.show(res.body, context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+        if (res.body == "success") {
+          pr.dismiss();
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => MainScreen()));
+        }else{
+          pr.dismiss();
+        }
+        
+      }).catchError((err) {
+        pr.dismiss();
+        print(err);
+      });
+    } else {}
   }
 
   void _onRegister() {
@@ -130,12 +161,12 @@ class _LoginPageState extends State<LoginPage> {
     print('Inside loadpref()');
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _email = (prefs.getString('email'));
-    _pass = (prefs.getString('pass'));
+    _password = (prefs.getString('pass'));
     print(_email);
-    print(_pass);
+    print(_password);
     if (_email.length > 1) {
       _emcontroller.text = _email;
-      _pscontroller.text = _pass;
+      _passcontroller.text = _password;
       setState(() {
         _isChecked = true;
       });
@@ -150,15 +181,15 @@ class _LoginPageState extends State<LoginPage> {
   void savepref(bool value) async {
     print('Inside savepref');
     _email = _emcontroller.text;
-    _pass = _pscontroller.text;
+    _password = _passcontroller.text;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (value) {
       //true save pref
-      if (_isEmailValid(_email) && (_pass.length > 5)) {
+      if (_isEmailValid(_email) && (_password.length > 5)) {
         await prefs.setString('email', _email);
-        await prefs.setString('pass', _pass);
+        await prefs.setString('pass', _password);
         print('Save pref $_email');
-        print('Save pref $_pass');
+        print('Save pref $_password');
         Toast.show("Preferences have been saved", context,
             duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
       } else {
@@ -174,12 +205,12 @@ class _LoginPageState extends State<LoginPage> {
       await prefs.setString('pass', '');
       setState(() {
         _emcontroller.text = '';
-        _pscontroller.text = '';
+        _passcontroller.text = '';
         _isChecked = false;
       });
       print('Remove pref');
       Toast.show("Preferences have been removed", context,
-            duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
+          duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
     }
   }
 
