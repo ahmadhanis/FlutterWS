@@ -128,7 +128,7 @@ class _LoginPageState extends State<LoginPage> {
         if (res.body == "success") {
           pr.dismiss();
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => MainScreen()));
+              context, MaterialPageRoute(builder: (context) => MainScreen(email: _email)));
         }else{
           pr.dismiss();
         }

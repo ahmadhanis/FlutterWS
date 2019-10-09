@@ -1,25 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:my_helper/tab_screen2.dart';
+import 'package:my_helper/tab_screen3.dart';
 import 'tab_screen.dart';
 
 class MainScreen extends StatefulWidget {
-  MainScreen() : super();
+  final String email;
 
-  //final String title = "Home";
+ const MainScreen({Key key,this.email}) : super(key: key);
 
   @override
   _MainScreenState createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int currentTabIndex = 0;
-  List<Widget> tabs = [
-    TabScreen(Colors.green, "Home"),
-    TabScreen2(Colors.orange, "Message"),
-    TabScreen(Colors.blue, "Profile")
-  ];
+ List<Widget> tabs;
 
-  String $pagetitle="Home";
+ int currentTabIndex = 0;
+ @override
+  void initState() {
+    super.initState();
+    tabs = [
+      TabScreen("Home", widget.email),
+      TabScreen2("Message"),
+      TabScreen3("Profile"),
+    ];
+  }
+
+  String $pagetitle = "Home";
+
   onTapped(int index) {
     setState(() {
       currentTabIndex = index;
@@ -38,8 +46,8 @@ class _MainScreenState extends State<MainScreen> {
         currentIndex: currentTabIndex,
         items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            title: Text("Home"),
+            icon: Icon(Icons.search),
+            title: Text("Jobs"),
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.mail),
@@ -53,4 +61,6 @@ class _MainScreenState extends State<MainScreen> {
       ),
     );
   }
+
+  
 }
