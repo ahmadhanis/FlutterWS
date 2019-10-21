@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:my_helper/tab_screen2.dart';
 import 'package:my_helper/tab_screen3.dart';
 import 'tab_screen.dart';
@@ -38,32 +39,30 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setEnabledSystemUIOverlays([]);
     return Scaffold(
-     // appBar: AppBar(
-     //   title: Text($pagetitle),
-     // ),
       body: tabs[currentTabIndex],
       bottomNavigationBar: BottomNavigationBar(
         onTap: onTapped,
         currentIndex: currentTabIndex,
-        backgroundColor: Colors.blueGrey,
+        //backgroundColor: Colors.blueGrey,
         type: BottomNavigationBarType.fixed ,
         
         items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.search,color: Color.fromARGB(255, 0, 0, 0)),
+            icon: Icon(Icons.search,color: Color.fromRGBO(159, 30, 99, 1)),
             title: Text("Jobs"),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.event,color: Color.fromARGB(255, 0, 0, 0)),
+            icon: Icon(Icons.event,color: Color.fromRGBO(159, 30, 99, 1)),
             title: Text("My Jobs"),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.mail,color: Color.fromARGB(255, 0, 0, 0)),
+            icon: Icon(Icons.mail,color: Color.fromRGBO(159, 30, 99, 1)),
             title: Text("Messages",style: TextStyle(color: Colors.black),),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person,color: Color.fromARGB(255, 0, 0, 0)),
+            icon: Icon(Icons.person,color: Color.fromRGBO(159, 30, 99, 1)),
             title: Text("Profile"),
           )
         ],
