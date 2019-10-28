@@ -8,7 +8,12 @@ import 'package:http/http.dart' as http;
 import 'package:progress_dialog/progress_dialog.dart';
 
 String urlLogin = "http://slumberjer.com/myhelper/php/login_user.php";
-
+final TextEditingController _emcontroller = TextEditingController();
+  String _email = "";
+  final TextEditingController _passcontroller = TextEditingController();
+  String _password = "";
+  bool _isChecked = false;
+  
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -26,11 +31,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController _emcontroller = TextEditingController();
-  String _email = "";
-  final TextEditingController _passcontroller = TextEditingController();
-  String _password = "";
-  bool _isChecked = false;
+  
 
   @override
   void initState() {

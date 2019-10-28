@@ -5,12 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:my_helper/mainscreen.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:toast/toast.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:flutter/services.dart';
+
 File _image;
 String pathAsset = 'assets/images/sliverwork.jpg';
 String urlUpload = "http://slumberjer.com/myhelper/php/upload_job.php";
 final TextEditingController _jobcontroller = TextEditingController();
 final TextEditingController _desccontroller = TextEditingController();
 final TextEditingController _pricecontroller = TextEditingController();
+final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
+Position _currentPosition;
+String _currentAddress = "Searching current location...";
 
 class NewJob extends StatefulWidget {
   final String email;
@@ -63,6 +69,12 @@ class CreateNewJob extends StatefulWidget {
 class _CreateNewJobState extends State<CreateNewJob> {
   String defaultValue = 'Pickup';
   @override
+  void initState() {
+    super.initState();
+    _getCurrentLocation();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
@@ -86,7 +98,6 @@ class _CreateNewJobState extends State<CreateNewJob> {
               labelText: 'Job Title',
               icon: Icon(Icons.title),
             )),
-        
         TextField(
             controller: _pricecontroller,
             keyboardType: TextInputType.number,
@@ -106,6 +117,18 @@ class _CreateNewJobState extends State<CreateNewJob> {
         SizedBox(
           height: 10,
         ),
+        Row(
+          children: <Widget>[
+            Icon(Icons.location_searching),
+            SizedBox(
+              width: 10,
+            ),
+            Text(_currentAddress)
+          ],
+        ),
+        SizedBox(
+          height: 10,
+        ),
         MaterialButton(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
@@ -122,49 +145,87 @@ class _CreateNewJobState extends State<CreateNewJob> {
   }
 
   void _choose() async {
-    _image = await ImagePicker.pickImage(
-        source: ImageSource.camera,maxHeight: 400);
+    _image =
+        await ImagePicker.pickImage(source: ImageSource.camera, maxHeight: 400);
     setState(() {});
     //_image = await ImagePicker.pickImage(source: ImageSource.gallery);
   }
 
   void _onAddJob() {
-    if (_image==null) {
+    if (_image == null) {
       Toast.show("Please take picture", context,
-            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-    return;
+          duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+      return;
     }
-    if (_jobcontroller.text.isEmpty){
+    if (_jobcontroller.text.isEmpty) {
       Toast.show("Please enter job title", context,
-            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-    return;
+          duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+      return;
     }
-    if (_pricecontroller.text.isEmpty){
+    if (_pricecontroller.text.isEmpty) {
       Toast.show("Please enter job price", context,
-            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-    return;
+          duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+      return;
     }
-   
+
     String base64Image = base64Encode(_image.readAsBytesSync());
-    print(base64Image);
+    print(_currentPosition.latitude.toString() +
+        "/" +
+        _currentPosition.longitude.toString());
     http.post(urlUpload, body: {
       "encoded_string": base64Image,
       "email": widget.email,
       "jobtitle": _jobcontroller.text,
       "jobdesc": _desccontroller.text,
       "jobprice": _pricecontroller.text,
+      "latitude": _currentPosition.latitude.toString(),
+      "longitude": _currentPosition.longitude.toString()
     }).then((res) {
       print(res.statusCode);
       Toast.show(res.body, context,
           duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-      _image = null;
-      Navigator.pushReplacement(
+      if (res.body.contains("success")){
+         _image = null;
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(
               builder: (BuildContext context) =>
                   MainScreen(email: widget.email)));
+      }
+     
     }).catchError((err) {
       print(err);
     });
+  }
+
+  _getCurrentLocation() async {
+    geolocator
+        .getCurrentPosition(desiredAccuracy: LocationAccuracy.best)
+        .then((Position position) {
+      setState(() {
+        _currentPosition = position;
+        // print(_getCurrentLocation);
+      });
+
+      _getAddressFromLatLng();
+    }).catchError((e) {
+      print(e);
+    });
+  }
+
+  _getAddressFromLatLng() async {
+    try {
+      List<Placemark> p = await geolocator.placemarkFromCoordinates(
+          _currentPosition.latitude, _currentPosition.longitude);
+
+      Placemark place = p[0];
+
+      setState(() {
+        _currentAddress =
+            "${place.name},${place.locality}, ${place.postalCode}, ${place.country}";
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 }
