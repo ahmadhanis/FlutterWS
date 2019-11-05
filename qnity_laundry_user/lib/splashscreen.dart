@@ -7,7 +7,10 @@ class SplashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: new ThemeData(primarySwatch: MaterialColor(0xFF880E4F, color)),
+      theme: new ThemeData(
+          brightness: Brightness.dark,
+          primaryColor: Colors.lightBlue[800],
+          accentColor: Colors.cyan[600]),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: Center(
@@ -50,10 +53,10 @@ class _ProgressIndicatorState extends State<ProgressIndicator>
         setState(() {
           if (animation.value > 0.99) {
             //print('Sucess Login');
-             Navigator.pushReplacement(
-                 context,
-                 MaterialPageRoute(
-                     builder: (BuildContext context) => MainScreen()));
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext context) => MainScreen()));
           }
         });
       });

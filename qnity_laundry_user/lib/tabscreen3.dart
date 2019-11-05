@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:qnity_laundry_user/loginscreen.dart';
 import 'package:qnity_laundry_user/requestpickup.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 class TabScreen3 extends StatefulWidget {
   final String apptitle;
-  
 
   TabScreen3(this.apptitle);
 
@@ -16,9 +15,9 @@ class TabScreen3 extends StatefulWidget {
 
 class _TabScreen3State extends State<TabScreen3> {
   List data;
-  String _name="Not registered",_password="",_email="";
+  String _name = "Not registered", _password = "", _email = "";
 
- @override
+  @override
   void initState() {
     loadpref();
     super.initState();
@@ -36,7 +35,7 @@ class _TabScreen3State extends State<TabScreen3> {
               //   title: const Text('Qnity Laundry'),
               //   backgroundColor: Color.fromRGBO(57, 195, 219, 1),
               // ),
-              
+
               body: ListView.builder(
                   itemCount: data == null ? 1 : data.length + 1,
                   itemBuilder: (context, index) {
@@ -49,71 +48,76 @@ class _TabScreen3State extends State<TabScreen3> {
                                 "assets/images/background.png",
                                 fit: BoxFit.fitWidth,
                               ),
-                               Column(
-                            children: <Widget>[
-                              SizedBox(
-                                height: 20,
-                              ),
-                              Center(
-                                child: Text("QNity-Laundry",
-                                    style: TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white)),
-                              ),
-                              Center(
-                                child: Text("Your Profile",
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white)),
-                              ),
-                              SizedBox(height: 10),
-                              Container(
-                                width: 300,
-                                height: 120,
-                                child: Card(
-                                  child: Padding(
-                                    padding: EdgeInsets.all(5.0),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: <Widget>[
-                                        Row(
+                              Column(
+                                children: <Widget>[
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                  Center(
+                                    child: Text("QNity-Laundry",
+                                        style: TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white)),
+                                  ),
+                                  Center(
+                                    child: Text("Your Profile",
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white)),
+                                  ),
+                                  SizedBox(height: 10),
+                                  Container(
+                                    width: 300,
+                                    height: 120,
+                                    child: Card(
+                                      child: Padding(
+                                        padding: EdgeInsets.all(5.0),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
                                           children: <Widget>[
-                                            Icon(Icons.location_on,
-                                                color: Color.fromRGBO(
-                                                    57, 195, 219, 1)),
-                                            SizedBox(
-                                              width: 5,
+                                            Row(
+                                              children: <Widget>[
+                                                Icon(Icons.location_on,
+                                                    color: Color.fromRGBO(
+                                                        57, 195, 219, 1)),
+                                                SizedBox(
+                                                  width: 5,
+                                                ),
+                                                Flexible(
+                                                  child: Text(
+                                                      "Universiti Utara Malaysia"),
+                                                ),
+                                              ],
                                             ),
-                                            Flexible(
-                                              child: Text("Universiti Utara Malaysia"),
+                                            Row(
+                                              children: <Widget>[
+                                                Icon(Icons.verified_user,
+                                                    color: Color.fromRGBO(
+                                                        57, 195, 219, 1)),
+                                                SizedBox(
+                                                  width: 5,
+                                                ),
+                                                Flexible(
+                                                  child: Text(_name ??
+                                                      'Not registered'),
+                                                ),
+                                              ],
                                             ),
+                                            
                                           ],
                                         ),
-                                        Row(
-                                          children: <Widget>[
-                                            Icon(Icons.verified_user,
-                                                color: Color.fromRGBO(
-                                                    57, 195, 219, 1)),
-                                            SizedBox(
-                                              width: 5,
-                                            ),
-                                            Flexible(
-                                              child: Text(
-                                                _name??'Not registered'
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
+                                      ),
                                     ),
                                   ),
-                                ),
+                                  MaterialButton(
+                                              child: Text("Logout"),
+                                              onPressed: _registration,
+                                            ),
+                                ],
                               ),
-                            ],
-                          ),
                             ],
                           ),
                         ],
@@ -124,10 +128,8 @@ class _TabScreen3State extends State<TabScreen3> {
   }
 
   void requestNewPickup() {
-    Navigator.push(
-                 context,
-                 MaterialPageRoute(
-                     builder: (BuildContext context) => RequestPickup()));
+    Navigator.push(context,
+        MaterialPageRoute(builder: (BuildContext context) => RequestPickup()));
   }
 
   Future<bool> _onBackPressAppBar() {
@@ -141,13 +143,16 @@ class _TabScreen3State extends State<TabScreen3> {
     _email = (prefs.getString('email'));
     _password = (prefs.getString('pass'));
     _name = (prefs.getString('name'));
-    if (_email==null || _name == null){
+    if (_email == null || _name == null) {
       print("No pref");
       return;
-    }else{
-      print(_email+"/"+_name);
+    } else {
+      print(_email + "/" + _name);
     }
-    
-    
+  }
+
+  void _registration() {
+    Navigator.push(context,
+        MaterialPageRoute(builder: (BuildContext context) => LoginPage()));
   }
 }

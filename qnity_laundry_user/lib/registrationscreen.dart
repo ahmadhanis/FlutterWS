@@ -1,17 +1,15 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:qnity_laundry_user/mainscreen.dart';
 import 'loginscreen.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:toast/toast.dart';
 import 'package:http/http.dart' as http;
 import 'package:progress_dialog/progress_dialog.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-String urlUpload = "http://slumberjer.com/myhelper/php/register_user.php";
-File _image;
+String urlUpload = "http://slumberjer.com/qnity/php/register_user.php";
 final TextEditingController _namecontroller = TextEditingController();
 final TextEditingController _emcontroller = TextEditingController();
 final TextEditingController _passcontroller = TextEditingController();
@@ -50,7 +48,6 @@ class _RegisterUserState extends State<RegisterScreen> {
   }
 
   Future<bool> _onBackPressAppBar() async {
-    _image = null;
     Navigator.push(
         context,
         MaterialPageRoute(
@@ -83,15 +80,16 @@ class RegisterWidgetState extends State<RegisterWidget> {
               child: Column(
                 children: <Widget>[
                   TextField(
-                      controller: _emcontroller,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(
-                        labelText: 'Email',
-                        icon: Icon(
-                          Icons.email,
-                          color: Color.fromRGBO(57, 195, 219, 1),
-                        ),focusColor: Color.fromRGBO(57, 195, 219, 1)
-                      )),
+                    controller: _emcontroller,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                      icon: Icon(
+                        Icons.email,
+                        color: Color.fromRGBO(57, 195, 219, 1),
+                      ),
+                    ),
+                  ),
                   SizedBox(
                     height: 10,
                   ),
@@ -150,20 +148,12 @@ class RegisterWidgetState extends State<RegisterWidget> {
     );
   }
 
-  void _choose() async {
-    _image = await ImagePicker.pickImage(source: ImageSource.camera);
-    setState(() {});
-    //_image = await ImagePicker.pickImage(source: ImageSource.gallery);
-  }
-
   void _onRegister() {
     print('onRegister Button from RegisterUser()');
-    print(_image.toString());
     uploadData();
   }
 
   void _onBackPress() {
-    _image = null;
     print('onBackpress from RegisterUser');
     Navigator.pushReplacement(context,
         MaterialPageRoute(builder: (BuildContext context) => LoginPage()));
@@ -177,32 +167,37 @@ class RegisterWidgetState extends State<RegisterWidget> {
 
     if ((_isEmailValid(_email)) &&
         (_password.length > 5) &&
-        (_image != null) &&
         (_phone.length > 5)) {
       ProgressDialog pr = new ProgressDialog(context,
           type: ProgressDialogType.Normal, isDismissible: false);
       pr.style(message: "Registration in progress");
       pr.show();
 
-      String base64Image = base64Encode(_image.readAsBytesSync());
       http.post(urlUpload, body: {
-        "encoded_string": base64Image,
         "name": _name,
         "email": _email,
         "password": _password,
         "phone": _phone,
       }).then((res) {
         print(res.statusCode);
-        Toast.show(res.body, context,
-            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-        _image = null;
-        _namecontroller.text = '';
-        _emcontroller.text = '';
-        _phcontroller.text = '';
-        _passcontroller.text = '';
-        pr.dismiss();
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (BuildContext context) => LoginPage()));
+        if (res.statusCode == 200 && res.body == "success") {
+          savepref();
+          Toast.show("Success", context,
+              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+          // _namecontroller.text = '';
+          // _emcontroller.text = '';
+          // _phcontroller.text = '';
+          // _passcontroller.text = '';
+          pr.dismiss();
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (BuildContext context) => LoginPage()));
+        }else{
+          Toast.show("Failed", context,
+              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+           pr.dismiss();
+        }
       }).catchError((err) {
         print(err);
       });
@@ -214,5 +209,19 @@ class RegisterWidgetState extends State<RegisterWidget> {
 
   bool _isEmailValid(String email) {
     return RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(email);
+  }
+
+  void savepref() async {
+    print('Inside savepref');
+    _email = _emcontroller.text;
+    _password = _passcontroller.text;
+    _name = _namecontroller.text;
+    _phone = _phcontroller.text;
+    
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('email', _email);
+    await prefs.setString('pass', _password);
+    await prefs.setString('name', _name);
+    await prefs.setString('phone', _phone);
   }
 }

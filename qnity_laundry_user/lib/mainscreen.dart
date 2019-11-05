@@ -57,7 +57,7 @@ class _MainScreenState extends State<MainScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.supervised_user_circle,color: Color.fromRGBO(57, 195, 219, 1)),
-            title: Text("Profile",style: TextStyle(color: Colors.black),),
+            title: Text("Profile"),
           ),
         ],
       ),

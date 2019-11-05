@@ -7,13 +7,13 @@ import 'package:toast/toast.dart';
 import 'package:http/http.dart' as http;
 import 'package:progress_dialog/progress_dialog.dart';
 
-String urlLogin = "http://slumberjer.com/myhelper/php/login_user.php";
+String urlLogin = "http://slumberjer.com/qnity/php/login_user.php";
 final TextEditingController _emcontroller = TextEditingController();
-  String _email = "";
-  final TextEditingController _passcontroller = TextEditingController();
-  String _password = "";
-  bool _isChecked = false;
-  
+String _email = "";
+final TextEditingController _passcontroller = TextEditingController();
+String _password = "";
+bool _isChecked = false;
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -31,12 +31,12 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+
   
 
   @override
   void initState() {
     loadpref();
-    print('Init: $_email');
     super.initState();
   }
 
@@ -129,11 +129,14 @@ class _LoginPageState extends State<LoginPage> {
         if (res.body == "success") {
           pr.dismiss();
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => MainScreen(email: _email)));
-        }else{
+              context,
+              MaterialPageRoute(
+                  builder: (context) => MainScreen(email: _email)));
+        } else {
+          Toast.show(res.body, context,
+              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
           pr.dismiss();
         }
-        
       }).catchError((err) {
         pr.dismiss();
         print(err);
@@ -161,11 +164,11 @@ class _LoginPageState extends State<LoginPage> {
   void loadpref() async {
     print('Inside loadpref()');
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    _email = (prefs.getString('email'));
-    _password = (prefs.getString('pass'));
+    _email = (prefs.getString('email')??'');
+    _password = (prefs.getString('pass')??'');
     print(_email);
     print(_password);
-    if (_email!=null) {
+    if (_email != null || _email !="") {
       _emcontroller.text = _email;
       _passcontroller.text = _password;
       setState(() {
@@ -204,6 +207,8 @@ class _LoginPageState extends State<LoginPage> {
     } else {
       await prefs.setString('email', '');
       await prefs.setString('pass', '');
+      await prefs.setString('name', '');
+      await prefs.setString('phone', '');
       setState(() {
         _emcontroller.text = '';
         _passcontroller.text = '';
@@ -224,4 +229,6 @@ class _LoginPageState extends State<LoginPage> {
   bool _isEmailValid(String email) {
     return RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(email);
   }
+
+  
 }
