@@ -7,8 +7,15 @@ void main() => runApp(SplashScreen());
 class SplashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    MaterialColor colorCustom = MaterialColor(0xFF880E4F, color);
     return MaterialApp(
-      theme: new ThemeData(primarySwatch: MaterialColor(0xFF880E4F, color)),
+      theme: new ThemeData(
+        inputDecorationTheme: new InputDecorationTheme(
+            labelStyle: new TextStyle(color: Color.fromRGBO(159, 30, 99, 1))),
+        primarySwatch: colorCustom,
+        textSelectionHandleColor: Color.fromRGBO(159, 30, 99, 1),
+        hintColor: Color.fromRGBO(159, 30, 99, 1),
+      ),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: Center(
@@ -17,7 +24,7 @@ class SplashScreen extends StatelessWidget {
             children: <Widget>[
               Image.asset(
                 'assets/images/splash.png',
-                scale: 2,
+                scale: 3,
               ),
               SizedBox(
                 height: 20,

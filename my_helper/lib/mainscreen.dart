@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:my_helper/tab_screen2.dart';
 import 'package:my_helper/tab_screen3.dart';
 import 'tab_screen.dart';
 
 class MainScreen extends StatefulWidget {
-  final String email;
+  final String email,radius;
 
- const MainScreen({Key key,this.email}) : super(key: key);
+ const MainScreen({Key key,this.email,this.radius}) : super(key: key);
 
   @override
   _MainScreenState createState() => _MainScreenState();
@@ -22,7 +21,7 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     tabs = [
-      TabScreen("Home", widget.email),
+      TabScreen("Home", widget.email,widget.radius),
       TabScreen2("MyJobs"),
       TabScreen2("Message"),
       TabScreen3("Profile"),
@@ -39,7 +38,7 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setEnabledSystemUIOverlays([]);
+    //SystemChrome.setEnabledSystemUIOverlays([]);
     return Scaffold(
       body: tabs[currentTabIndex],
       bottomNavigationBar: BottomNavigationBar(
@@ -59,7 +58,7 @@ class _MainScreenState extends State<MainScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.mail,color: Color.fromRGBO(159, 30, 99, 1)),
-            title: Text("Messages",style: TextStyle(color: Colors.black),),
+            title: Text("Messages"),
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person,color: Color.fromRGBO(159, 30, 99, 1)),

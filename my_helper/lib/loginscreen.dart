@@ -9,11 +9,11 @@ import 'package:progress_dialog/progress_dialog.dart';
 
 String urlLogin = "http://slumberjer.com/myhelper/php/login_user.php";
 final TextEditingController _emcontroller = TextEditingController();
-  String _email = "";
-  final TextEditingController _passcontroller = TextEditingController();
-  String _password = "";
-  bool _isChecked = false;
-  
+String _email = "";
+final TextEditingController _passcontroller = TextEditingController();
+String _password = "";
+bool _isChecked = false;
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -31,8 +31,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  
-
   @override
   void initState() {
     loadpref();
@@ -42,6 +40,8 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+        SystemUiOverlayStyle(statusBarColor: Color.fromRGBO(159, 30, 99, 1)));
     return WillPopScope(
         onWillPop: _onBackPressAppBar,
         child: Scaffold(
@@ -53,7 +53,7 @@ class _LoginPageState extends State<LoginPage> {
               children: <Widget>[
                 Image.asset(
                   'assets/images/splash.png',
-                  scale: 2.5,
+                  scale: 3,
                 ),
                 TextField(
                     controller: _emcontroller,
@@ -124,16 +124,22 @@ class _LoginPageState extends State<LoginPage> {
         "password": _password,
       }).then((res) {
         print(res.statusCode);
-        Toast.show(res.body, context,
+        var string = res.body;
+        List dres = string.split(",");
+        print(dres);
+        Toast.show(dres[0], context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-        if (res.body == "success") {
+        if (dres[0] == "success") {
           pr.dismiss();
+          print("Radius:");
+          print(dres[1]);
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => MainScreen(email: _email)));
-        }else{
+              context,
+              MaterialPageRoute(
+                  builder: (context) => MainScreen(email: _email, radius: dres[1])));
+        } else {
           pr.dismiss();
         }
-        
       }).catchError((err) {
         pr.dismiss();
         print(err);

@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:toast/toast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/services.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 
 File _image;
 String pathAsset = 'assets/images/sliverwork.jpg';
@@ -16,12 +17,12 @@ final TextEditingController _desccontroller = TextEditingController();
 final TextEditingController _pricecontroller = TextEditingController();
 final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
 Position _currentPosition;
-String _currentAddress = "Searching current location...";
+String _currentAddress = "Searching your current location...";
 
 class NewJob extends StatefulWidget {
   final String email;
-
-  const NewJob({Key key, this.email}) : super(key: key);
+  final String radius;
+  const NewJob({Key key, this.email,this.radius}) : super(key: key);
 
   @override
   _NewJobState createState() => _NewJobState();
@@ -33,9 +34,10 @@ class _NewJobState extends State<NewJob> {
     return WillPopScope(
       onWillPop: _onBackPressAppBar,
       child: Scaffold(
-          resizeToAvoidBottomPadding: false,
+          //resizeToAvoidBottomPadding: false,
           appBar: AppBar(
             title: Text('REQUEST HELP'),
+            backgroundColor: Color.fromRGBO(159, 30, 99, 1),
           ),
           body: SingleChildScrollView(
             child: Container(
@@ -47,20 +49,18 @@ class _NewJobState extends State<NewJob> {
   }
 
   Future<bool> _onBackPressAppBar() async {
-    Navigator.push(
+    Navigator.pop(
         context,
         MaterialPageRoute(
-          builder: (context) => MainScreen(email: widget.email),
+          builder: (context) => MainScreen(email: widget.email, radius: widget.radius,),
         ));
     return Future.value(false);
   }
 }
 
 class CreateNewJob extends StatefulWidget {
-  String email;
-  CreateNewJob(String email) {
-    this.email = email;
-  }
+  final String email;
+  CreateNewJob(this.email);
 
   @override
   _CreateNewJobState createState() => _CreateNewJobState();
@@ -90,7 +90,7 @@ class _CreateNewJobState extends State<CreateNewJob> {
                 fit: BoxFit.fill,
               )),
             )),
-        Text('Click on image above to take profile picture'),
+        Text('Click on image above to take job picture'),
         TextField(
             controller: _jobcontroller,
             keyboardType: TextInputType.emailAddress,
@@ -115,7 +115,17 @@ class _CreateNewJobState extends State<CreateNewJob> {
               icon: Icon(Icons.info),
             )),
         SizedBox(
-          height: 10,
+          height: 5,
+        ),
+        Container(
+          alignment: Alignment.topLeft,
+          child: Text("Job Location",
+              style: TextStyle(
+                  color: Color.fromRGBO(159, 30, 99, 1),
+                  fontWeight: FontWeight.bold)),
+        ),
+        SizedBox(
+          height: 5,
         ),
         Row(
           children: <Widget>[
@@ -167,11 +177,15 @@ class _CreateNewJobState extends State<CreateNewJob> {
           duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       return;
     }
-
+    ProgressDialog pr = new ProgressDialog(context,
+        type: ProgressDialogType.Normal, isDismissible: false);
+    pr.style(message: "Requesting...");
+    pr.show();
     String base64Image = base64Encode(_image.readAsBytesSync());
     print(_currentPosition.latitude.toString() +
         "/" +
         _currentPosition.longitude.toString());
+
     http.post(urlUpload, body: {
       "encoded_string": base64Image,
       "email": widget.email,
@@ -181,20 +195,25 @@ class _CreateNewJobState extends State<CreateNewJob> {
       "latitude": _currentPosition.latitude.toString(),
       "longitude": _currentPosition.longitude.toString()
     }).then((res) {
-      print(res.statusCode);
+      print(urlUpload);
       Toast.show(res.body, context,
           duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-      if (res.body.contains("success")){
-         _image = null;
+      if (res.body.contains("success")) {
+        _image = null;
+        _jobcontroller.text = "";
+        _pricecontroller.text = "";
+        _desccontroller.text = "";
+        pr.dismiss();
+
         Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (BuildContext context) =>
-                  MainScreen(email: widget.email)));
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context) =>
+                    MainScreen(email: widget.email)));
       }
-     
     }).catchError((err) {
       print(err);
+      pr.dismiss();
     });
   }
 
