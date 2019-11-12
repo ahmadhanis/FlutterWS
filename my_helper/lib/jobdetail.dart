@@ -17,7 +17,7 @@ class JobDetail extends StatefulWidget {
       joblatitude,
       joblongitude,
       jobtime,
-      jobradius;
+      jobradius,name,credit;
 
   const JobDetail(
       {Key key,
@@ -31,7 +31,7 @@ class JobDetail extends StatefulWidget {
       this.joblatitude,
       this.joblongitude,
       this.jobtime,
-      this.jobradius})
+      this.jobradius,this.name,this.credit})
       : super(key: key);
 
   @override
@@ -71,7 +71,7 @@ class _JobDetailState extends State<JobDetail> {
         MaterialPageRoute(
           builder: (context) => MainScreen(
             email: widget.useremail,
-            radius: widget.jobradius,
+            radius: widget.jobradius,name:widget.name
           ),
         ));
     return Future.value(false);

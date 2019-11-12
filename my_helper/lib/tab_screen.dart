@@ -7,15 +7,13 @@ import 'package:my_helper/newjob.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/services.dart';
 
-double perpage=1;
+double perpage = 1;
 
 class TabScreen extends StatefulWidget {
-  final String apptitle;
-  final String email;
+  final String email, name, credit;
   final String radius;
 
-
-  TabScreen(this.apptitle, this.email, this.radius);
+  TabScreen(this.email, this.radius, this.name, this.credit);
 
   @override
   _TabScreenState createState() => _TabScreenState();
@@ -95,7 +93,7 @@ class _TabScreenState extends State<TabScreen> {
                                           children: <Widget>[
                                             Row(
                                               children: <Widget>[
-                                                Icon(Icons.verified_user,
+                                                Icon(Icons.person,
                                                     color: Color.fromRGBO(
                                                         159, 30, 99, 1)),
                                                 SizedBox(
@@ -103,7 +101,7 @@ class _TabScreenState extends State<TabScreen> {
                                                 ),
                                                 Flexible(
                                                   child: Text(
-                                                    widget.email,
+                                                    widget.name.toUpperCase(),style: TextStyle(fontWeight: FontWeight.bold),
                                                   ),
                                                 ),
                                               ],
@@ -137,6 +135,19 @@ class _TabScreenState extends State<TabScreen> {
                                                 ),
                                               ],
                                             ),
+                                            Row(
+                                              children: <Widget>[
+                                                Icon(Icons.credit_card,
+                                                    color: Color.fromRGBO(
+                                                        159, 30, 99, 1)),
+                                                SizedBox(
+                                                  width: 5,
+                                                ),
+                                                Flexible(
+                                                  child: Text("You have "+widget.credit+ " Credit"),
+                                                ),
+                                              ],
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -162,12 +173,15 @@ class _TabScreenState extends State<TabScreen> {
                         ),
                       );
                     }
-                    if (index == data.length && perpage>1) {
+                    if (index == data.length && perpage > 1) {
                       return Container(
                         width: 250,
                         color: Colors.white,
                         child: MaterialButton(
-                          child: Text("Load More",style: TextStyle(color: Colors.black),),
+                          child: Text(
+                            "Load More",
+                            style: TextStyle(color: Colors.black),
+                          ),
                           onPressed: () {},
                         ),
                       );
@@ -187,7 +201,8 @@ class _TabScreenState extends State<TabScreen> {
                               data[index]['jobtime'],
                               data[index]['jobtitle'],
                               data[index]['joblatitude'],
-                              data[index]['joblongitude']),
+                              data[index]['joblongitude'],
+                              widget.radius,widget.name,widget.credit,),
                           onLongPress: _onJobDelete,
                           child: Padding(
                             padding: const EdgeInsets.all(2.0),
@@ -290,8 +305,8 @@ class _TabScreenState extends State<TabScreen> {
         var extractdata = json.decode(res.body);
         data = extractdata["jobs"];
         perpage = (data.length / 10);
-        print("Perpage");
-        print(perpage);
+        print("data");
+        print(data);
       });
     }).catchError((err) {
       print(err);
@@ -328,7 +343,7 @@ class _TabScreenState extends State<TabScreen> {
       String jobtime,
       String jobtitle,
       String joblatitude,
-      String joblongitude) {
+      String joblongitude,  String email,String name,String credit) {
     //print(data);
     Navigator.push(
         context,
@@ -344,7 +359,7 @@ class _TabScreenState extends State<TabScreen> {
                 jobtime: jobtime,
                 joblatitude: joblatitude,
                 joblongitude: joblongitude,
-                jobradius: widget.radius)));
+                jobradius: widget.radius,name: widget.name, credit: widget.credit,)));
   }
 
   void _onJobDelete() {

@@ -20,9 +20,9 @@ Position _currentPosition;
 String _currentAddress = "Searching your current location...";
 
 class NewJob extends StatefulWidget {
-  final String email;
+  final String email,name,credit;
   final String radius;
-  const NewJob({Key key, this.email,this.radius}) : super(key: key);
+  const NewJob({Key key, this.email,this.radius,this.name,this.credit}) : super(key: key);
 
   @override
   _NewJobState createState() => _NewJobState();
@@ -52,7 +52,7 @@ class _NewJobState extends State<NewJob> {
     Navigator.pop(
         context,
         MaterialPageRoute(
-          builder: (context) => MainScreen(email: widget.email, radius: widget.radius,),
+          builder: (context) => MainScreen(email: widget.email, radius: widget.radius, name: widget.name,credit:widget.credit),
         ));
     return Future.value(false);
   }

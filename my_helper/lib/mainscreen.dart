@@ -4,9 +4,9 @@ import 'package:my_helper/tab_screen3.dart';
 import 'tab_screen.dart';
 
 class MainScreen extends StatefulWidget {
-  final String email,radius;
+  final String email,radius,name,credit;
 
- const MainScreen({Key key,this.email,this.radius}) : super(key: key);
+ const MainScreen({Key key,this.email,this.radius,this.name,this.credit}) : super(key: key);
 
   @override
   _MainScreenState createState() => _MainScreenState();
@@ -21,7 +21,7 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     tabs = [
-      TabScreen("Home", widget.email,widget.radius),
+      TabScreen(widget.email,widget.radius,widget.name,widget.credit),
       TabScreen2("MyJobs"),
       TabScreen2("Message"),
       TabScreen3("Profile"),

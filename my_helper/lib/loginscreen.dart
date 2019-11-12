@@ -132,11 +132,11 @@ class _LoginPageState extends State<LoginPage> {
         if (dres[0] == "success") {
           pr.dismiss();
           print("Radius:");
-          print(dres[1]);
+          print(dres[3]);
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => MainScreen(email: _email, radius: dres[1])));
+                  builder: (context) => MainScreen(email: _email, radius: dres[1],name: dres[2], credit: dres[3])));
         } else {
           pr.dismiss();
         }
