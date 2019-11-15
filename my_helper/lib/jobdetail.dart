@@ -1,38 +1,18 @@
 import 'dart:async';
-
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
+import 'package:my_helper/user.dart';
+import 'package:toast/toast.dart';
+import 'package:progress_dialog/progress_dialog.dart';
+import 'job.dart';
 import 'mainscreen.dart';
 
 class JobDetail extends StatefulWidget {
-  //final String email,jobid;
-  final String useremail,
-      jobid,
-      jobprice,
-      jobdesc,
-      jobowner,
-      jobimage,
-      jobtitle,
-      joblatitude,
-      joblongitude,
-      jobtime,
-      jobradius,name,credit;
+  final Job job;
+  final User user;
 
-  const JobDetail(
-      {Key key,
-      this.useremail,
-      this.jobid,
-      this.jobprice,
-      this.jobdesc,
-      this.jobowner,
-      this.jobimage,
-      this.jobtitle,
-      this.joblatitude,
-      this.joblongitude,
-      this.jobtime,
-      this.jobradius,this.name,this.credit})
-      : super(key: key);
+  const JobDetail({Key key, this.job, this.user}) : super(key: key);
 
   @override
   _JobDetailState createState() => _JobDetailState();
@@ -53,13 +33,9 @@ class _JobDetailState extends State<JobDetail> {
             child: Container(
               padding: EdgeInsets.fromLTRB(40, 20, 40, 20),
               child: DetailInterface(
-                  widget.jobimage,
-                  widget.jobtitle,
-                  widget.jobdesc,
-                  widget.jobprice,
-                  widget.joblatitude,
-                  widget.joblongitude,
-                  widget.jobtime),
+                job: widget.job,
+                user: widget.user,
+              ),
             ),
           )),
     );
@@ -70,8 +46,7 @@ class _JobDetailState extends State<JobDetail> {
         context,
         MaterialPageRoute(
           builder: (context) => MainScreen(
-            email: widget.useremail,
-            radius: widget.jobradius,name:widget.name
+            user: widget.user,
           ),
         ));
     return Future.value(false);
@@ -79,16 +54,9 @@ class _JobDetailState extends State<JobDetail> {
 }
 
 class DetailInterface extends StatefulWidget {
- final String jobimage,
-      jobtitle,
-      jobdesc,
-      jobprice,
-      joblatitude,
-      joblongitude,
-      jobtime;
-
-  DetailInterface(this.jobimage, this.jobtitle, this.jobdesc, this.jobprice,
-      this.joblatitude, this.joblongitude, this.jobtime);
+  final Job job;
+  final User user;
+  DetailInterface({this.job, this.user});
 
   @override
   _DetailInterfaceState createState() => _DetailInterfaceState();
@@ -103,7 +71,7 @@ class _DetailInterfaceState extends State<DetailInterface> {
     super.initState();
     _myLocation = CameraPosition(
       target: LatLng(
-          double.parse(widget.joblatitude), double.parse(widget.joblongitude)),
+          double.parse(widget.job.joblat), double.parse(widget.job.joblon)),
       zoom: 17,
     );
     print(_myLocation.toString());
@@ -118,18 +86,18 @@ class _DetailInterfaceState extends State<DetailInterface> {
           width: 280,
           height: 200,
           child: Image.network(
-              'http://slumberjer.com/myhelper/images/${widget.jobimage}.jpg',
+              'http://slumberjer.com/myhelper/images/${widget.job.jobimage}.jpg',
               fit: BoxFit.fill),
         ),
         SizedBox(
           height: 10,
         ),
-        Text(widget.jobtitle.toUpperCase(),
+        Text(widget.job.jobtitle.toUpperCase(),
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
             )),
-        Text(widget.jobtime),
+        Text(widget.job.jobtime),
         Container(
           alignment: Alignment.topLeft,
           child: Column(
@@ -142,12 +110,12 @@ class _DetailInterfaceState extends State<DetailInterface> {
                 TableRow(children: [
                   Text("Job Description",
                       style: TextStyle(fontWeight: FontWeight.bold)),
-                  Text(widget.jobdesc),
+                  Text(widget.job.jobdes),
                 ]),
                 TableRow(children: [
                   Text("Job Price",
                       style: TextStyle(fontWeight: FontWeight.bold)),
-                  Text("RM" + widget.jobprice),
+                  Text("RM" + widget.job.jobprice),
                 ]),
                 TableRow(children: [
                   Text("Job Location",
@@ -160,6 +128,7 @@ class _DetailInterfaceState extends State<DetailInterface> {
               ),
               Container(
                 height: 120,
+                width: 340,
                 child: GoogleMap(
                   // 2
                   initialCameraPosition: _myLocation,
@@ -196,5 +165,73 @@ class _DetailInterfaceState extends State<DetailInterface> {
     );
   }
 
-  void _onAcceptJob() {}
+  void _onAcceptJob() {
+    print("Accept Job");
+    _showDialog();
+  }
+
+  void _showDialog() {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Accept " + widget.job.jobtitle),
+          content: new Text("Are your sure?"),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Yes"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                acceptRequest(widget.job.jobid);
+              },
+            ),
+            new FlatButton(
+              child: new Text("No"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<String> acceptRequest(String jobid) async {
+    String urlLoadJobs = "http://slumberjer.com/myhelper/php/accept_job.php";
+    ProgressDialog pr = new ProgressDialog(context,
+        type: ProgressDialogType.Normal, isDismissible: false);
+    pr.style(message: "Accepting Job");
+    pr.show();
+    http.post(urlLoadJobs, body: {
+      "jobid": widget.job.jobid,
+      "email": widget.user.email,
+    }).then((res) {
+      print(res.body);
+      if (res.body == "success") {
+        Toast.show("Success", context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+            pr.dismiss();
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MainScreen(
+                user: widget.user,
+              ),
+            ));
+        //init();
+      } else {
+        Toast.show("Failed", context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+            pr.dismiss();
+      }
+    }).catchError((err) {
+      print(err);
+      pr.dismiss();
+    });
+    return null;
+  }
 }

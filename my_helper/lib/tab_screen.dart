@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:my_helper/job.dart';
 import 'package:my_helper/jobdetail.dart';
 import 'dart:convert';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:my_helper/newjob.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/services.dart';
+import 'package:my_helper/user.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 
 double perpage = 1;
 
 class TabScreen extends StatefulWidget {
-  final String email, name, credit;
-  final String radius;
+  final User user;
 
-  TabScreen(this.email, this.radius, this.name, this.credit);
+  TabScreen({Key key, this.user});
 
   @override
   _TabScreenState createState() => _TabScreenState();
@@ -36,19 +37,14 @@ class _TabScreenState extends State<TabScreen> {
 
   @override
   Widget build(BuildContext context) {
+    
     SystemChrome.setSystemUIOverlayStyle(
         SystemUiOverlayStyle(statusBarColor: Color.fromRGBO(159, 30, 99, 1)));
     return MaterialApp(
         debugShowCheckedModeBanner: false,
         home: Scaffold(
             resizeToAvoidBottomPadding: false,
-            floatingActionButton: FloatingActionButton(
-              child: Icon(Icons.add),
-              backgroundColor: Color.fromRGBO(159, 30, 99, 1),
-              elevation: 2.0,
-              onPressed: requestNewJob,
-              tooltip: 'Request new help',
-            ),
+           
             body: RefreshIndicator(
               key: refreshKey,
               color: Color.fromRGBO(159, 30, 99, 1),
@@ -83,7 +79,7 @@ class _TabScreenState extends State<TabScreen> {
                                   SizedBox(height: 10),
                                   Container(
                                     width: 300,
-                                    height: 120,
+                                    height: 140,
                                     child: Card(
                                       child: Padding(
                                         padding: EdgeInsets.all(5.0),
@@ -101,7 +97,12 @@ class _TabScreenState extends State<TabScreen> {
                                                 ),
                                                 Flexible(
                                                   child: Text(
-                                                    widget.name.toUpperCase(),style: TextStyle(fontWeight: FontWeight.bold),
+                                                    widget.user.name
+                                                            .toUpperCase() ??
+                                                        "Not registered",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold),
                                                   ),
                                                 ),
                                               ],
@@ -130,7 +131,7 @@ class _TabScreenState extends State<TabScreen> {
                                                 Flexible(
                                                   child: Text(
                                                       "Job Radius within " +
-                                                          widget.radius +
+                                                          widget.user.radius +
                                                           " KM"),
                                                 ),
                                               ],
@@ -144,7 +145,9 @@ class _TabScreenState extends State<TabScreen> {
                                                   width: 5,
                                                 ),
                                                 Flexible(
-                                                  child: Text("You have "+widget.credit+ " Credit"),
+                                                  child: Text("You have " +
+                                                      widget.user.credit +
+                                                      " Credit"),
                                                 ),
                                               ],
                                             ),
@@ -193,16 +196,20 @@ class _TabScreenState extends State<TabScreen> {
                         elevation: 2,
                         child: InkWell(
                           onTap: () => _onJobDetail(
-                              data[index]['jobid'],
-                              data[index]['jobprice'],
-                              data[index]['jobdesc'],
-                              data[index]['jobowner'],
-                              data[index]['jobimage'],
-                              data[index]['jobtime'],
-                              data[index]['jobtitle'],
-                              data[index]['joblatitude'],
-                              data[index]['joblongitude'],
-                              widget.radius,widget.name,widget.credit,),
+                            data[index]['jobid'],
+                            data[index]['jobprice'],
+                            data[index]['jobdesc'],
+                            data[index]['jobowner'],
+                            data[index]['jobimage'],
+                            data[index]['jobtime'],
+                            data[index]['jobtitle'],
+                            data[index]['joblatitude'],
+                            data[index]['joblongitude'],
+                            data[index]['jobrating'],
+                            widget.user.radius,
+                            widget.user.name,
+                            widget.user.credit,
+                          ),
                           onLongPress: _onJobDelete,
                           child: Padding(
                             padding: const EdgeInsets.all(2.0),
@@ -230,7 +237,8 @@ class _TabScreenState extends State<TabScreen> {
                                         RatingBar(
                                           itemCount: 5,
                                           itemSize: 12,
-                                          initialRating: 4.5,
+                                          initialRating: double.parse(data[index]['jobrating']
+                                                .toString()),
                                           itemPadding: EdgeInsets.symmetric(
                                               horizontal: 2.0),
                                           itemBuilder: (context, _) => Icon(
@@ -266,9 +274,8 @@ class _TabScreenState extends State<TabScreen> {
         .then((Position position) {
       setState(() {
         _currentPosition = position;
-        print(_getCurrentLocation);
+        print(_currentPosition);
       });
-
       _getAddressFromLatLng();
     }).catchError((e) {
       print(e);
@@ -285,7 +292,7 @@ class _TabScreenState extends State<TabScreen> {
       setState(() {
         _currentAddress =
             "${place.name},${place.locality}, ${place.postalCode}, ${place.country}";
-        init();
+        init(); //load data from database into list array 'data'
       });
     } catch (e) {
       print(e);
@@ -294,12 +301,15 @@ class _TabScreenState extends State<TabScreen> {
 
   Future<String> makeRequest() async {
     String urlLoadJobs = "http://slumberjer.com/myhelper/php/load_jobs.php";
-
+    ProgressDialog pr = new ProgressDialog(context,
+        type: ProgressDialogType.Normal, isDismissible: false);
+    pr.style(message: "Loading Jobs");
+    pr.show();
     http.post(urlLoadJobs, body: {
-      "email": widget.email,
+      "email": widget.user.email ?? "notavail",
       "latitude": _currentPosition.latitude.toString(),
       "longitude": _currentPosition.longitude.toString(),
-      "radius": widget.radius,
+      "radius": widget.user.radius ?? "10",
     }).then((res) {
       setState(() {
         var extractdata = json.decode(res.body);
@@ -307,9 +317,11 @@ class _TabScreenState extends State<TabScreen> {
         perpage = (data.length / 10);
         print("data");
         print(data);
+        pr.dismiss();
       });
     }).catchError((err) {
       print(err);
+      pr.dismiss();
     });
     return null;
   }
@@ -325,15 +337,8 @@ class _TabScreenState extends State<TabScreen> {
     return null;
   }
 
-  void requestNewJob() {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (BuildContext context) =>
-                NewJob(email: widget.email, radius: widget.radius)));
-  }
+  
 
-//data[index]['jobid'],data[index]['jobprice'],data[index]['jobdesc'],data[index]['jobowner'],data[index]['jobimage'],data[index]['jobtime']
   void _onJobDetail(
       String jobid,
       String jobprice,
@@ -343,23 +348,29 @@ class _TabScreenState extends State<TabScreen> {
       String jobtime,
       String jobtitle,
       String joblatitude,
-      String joblongitude,  String email,String name,String credit) {
+      String joblongitude,
+      String jobrating,
+      String email,
+      String name,
+      String credit) {
+    Job job = new Job(
+        jobid: jobid,
+        jobtitle: jobtitle,
+        jobowner: jobowner,
+        jobdes: jobdesc,
+        jobprice: jobprice,
+        jobtime: jobtime,
+        jobimage: jobimage,
+        jobworker: null,
+        joblat: joblatitude,
+        joblon: joblongitude,
+        jobrating:jobrating );
     //print(data);
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (BuildContext context) => JobDetail(
-                useremail: widget.email,
-                jobid: jobid,
-                jobprice: jobprice,
-                jobdesc: jobdesc,
-                jobowner: jobowner,
-                jobimage: jobimage,
-                jobtitle: jobtitle,
-                jobtime: jobtime,
-                joblatitude: joblatitude,
-                joblongitude: joblongitude,
-                jobradius: widget.radius,name: widget.name, credit: widget.credit,)));
+            builder: (BuildContext context) =>
+                JobDetail(job: job, user: widget.user)));
   }
 
   void _onJobDelete() {

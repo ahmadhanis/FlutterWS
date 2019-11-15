@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 import 'package:http/http.dart' as http;
 import 'package:progress_dialog/progress_dialog.dart';
+import 'user.dart';
 
 String urlLogin = "http://slumberjer.com/myhelper/php/login_user.php";
 final TextEditingController _emcontroller = TextEditingController();
@@ -132,11 +133,12 @@ class _LoginPageState extends State<LoginPage> {
         if (dres[0] == "success") {
           pr.dismiss();
           print("Radius:");
-          print(dres[3]);
+          print(dres);
+          User user = new User(name:dres[1],email: dres[2],phone:dres[3],radius: dres[4],credit: dres[5]);
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => MainScreen(email: _email, radius: dres[1],name: dres[2], credit: dres[3])));
+                  builder: (context) => MainScreen(user: user)));
         } else {
           pr.dismiss();
         }

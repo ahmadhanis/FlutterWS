@@ -40,6 +40,7 @@ class _RegisterUserState extends State<RegisterScreen> {
       child: Scaffold(
         resizeToAvoidBottomPadding: false,
         appBar: AppBar(
+          backgroundColor: Color.fromRGBO(159, 30, 99, 1),
           title: Text('New User Registration'),
         ),
         body: SingleChildScrollView(

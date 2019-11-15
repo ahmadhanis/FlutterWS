@@ -4,14 +4,17 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:my_helper/mainscreen.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:my_helper/user.dart';
 import 'package:toast/toast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/services.dart';
 import 'package:progress_dialog/progress_dialog.dart';
-
+import 'package:place_picker/place_picker.dart';
 File _image;
 String pathAsset = 'assets/images/sliverwork.jpg';
 String urlUpload = "http://slumberjer.com/myhelper/php/upload_job.php";
+String urlgetuser = "http://slumberjer.com/myhelper/php/get_user.php";
+
 final TextEditingController _jobcontroller = TextEditingController();
 final TextEditingController _desccontroller = TextEditingController();
 final TextEditingController _pricecontroller = TextEditingController();
@@ -20,9 +23,9 @@ Position _currentPosition;
 String _currentAddress = "Searching your current location...";
 
 class NewJob extends StatefulWidget {
-  final String email,name,credit;
-  final String radius;
-  const NewJob({Key key, this.email,this.radius,this.name,this.credit}) : super(key: key);
+  final User user;
+
+  const NewJob({Key key, this.user}) : super(key: key);
 
   @override
   _NewJobState createState() => _NewJobState();
@@ -42,7 +45,7 @@ class _NewJobState extends State<NewJob> {
           body: SingleChildScrollView(
             child: Container(
               padding: EdgeInsets.fromLTRB(40, 20, 40, 20),
-              child: CreateNewJob(widget.email),
+              child: CreateNewJob(widget.user),
             ),
           )),
     );
@@ -52,15 +55,17 @@ class _NewJobState extends State<NewJob> {
     Navigator.pop(
         context,
         MaterialPageRoute(
-          builder: (context) => MainScreen(email: widget.email, radius: widget.radius, name: widget.name,credit:widget.credit),
+          builder: (context) => MainScreen(
+            user: widget.user,
+          ),
         ));
     return Future.value(false);
   }
 }
 
 class CreateNewJob extends StatefulWidget {
-  final String email;
-  CreateNewJob(this.email);
+  final User user;
+  CreateNewJob(this.user);
 
   @override
   _CreateNewJobState createState() => _CreateNewJobState();
@@ -117,13 +122,15 @@ class _CreateNewJobState extends State<CreateNewJob> {
         SizedBox(
           height: 5,
         ),
-        Container(
-          alignment: Alignment.topLeft,
-          child: Text("Job Location",
-              style: TextStyle(
-                  color: Color.fromRGBO(159, 30, 99, 1),
-                  fontWeight: FontWeight.bold)),
-        ),
+        GestureDetector(
+            onTap: _loadmap,
+            child: Container(
+              alignment: Alignment.topLeft,
+              child: Text("Job Location",
+                  style: TextStyle(
+                      color: Color.fromRGBO(159, 30, 99, 1),
+                      fontWeight: FontWeight.bold)),
+            )),
         SizedBox(
           height: 5,
         ),
@@ -188,12 +195,14 @@ class _CreateNewJobState extends State<CreateNewJob> {
 
     http.post(urlUpload, body: {
       "encoded_string": base64Image,
-      "email": widget.email,
+      "email": widget.user.email,
       "jobtitle": _jobcontroller.text,
       "jobdesc": _desccontroller.text,
       "jobprice": _pricecontroller.text,
       "latitude": _currentPosition.latitude.toString(),
-      "longitude": _currentPosition.longitude.toString()
+      "longitude": _currentPosition.longitude.toString(),
+      "credit": widget.user.credit,
+      "rating": widget.user.rating
     }).then((res) {
       print(urlUpload);
       Toast.show(res.body, context,
@@ -204,12 +213,12 @@ class _CreateNewJobState extends State<CreateNewJob> {
         _pricecontroller.text = "";
         _desccontroller.text = "";
         pr.dismiss();
-
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (BuildContext context) =>
-                    MainScreen(email: widget.email)));
+        print(widget.user.email);
+        _onLogin(widget.user.email, context);
+      } else {
+        pr.dismiss();
+        Toast.show(res.body + ". Please reload", context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       }
     }).catchError((err) {
       print(err);
@@ -246,5 +255,38 @@ class _CreateNewJobState extends State<CreateNewJob> {
     } catch (e) {
       print(e);
     }
+  }
+
+  void _onLogin(String email, BuildContext ctx) {
+    http.post(urlgetuser, body: {
+      "email": email,
+    }).then((res) {
+      print(res.statusCode);
+      var string = res.body;
+      List dres = string.split(",");
+      print(dres);
+      if (dres[0] == "success") {
+        User user = new User(
+            name: dres[1],
+            email: dres[2],
+            phone: dres[3],
+            radius: dres[4],
+            credit: dres[5],
+            rating: dres[6]);
+        Navigator.push(ctx,
+            MaterialPageRoute(builder: (context) => MainScreen(user: user)));
+      }
+    }).catchError((err) {
+      print(err);
+    });
+  }
+
+  void _loadmap() async  {
+    LocationResult result = await Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => PlacePicker("AIzaSyAvIHhXiQ7TxWE2L7WY_qP2WpBDrR7TWHk")));
+
+    // Handle the result in your way
+    print("MAP SHOW:");
+    print(result);
   }
 }
