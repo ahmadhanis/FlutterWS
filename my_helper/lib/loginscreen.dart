@@ -134,7 +134,7 @@ class _LoginPageState extends State<LoginPage> {
           pr.dismiss();
           print("Radius:");
           print(dres);
-          User user = new User(name:dres[1],email: dres[2],phone:dres[3],radius: dres[4],credit: dres[5]);
+         User user = new User(name:dres[1],email: dres[2],phone:dres[3],radius: dres[4],credit: dres[5],rating: dres[6]);
           Navigator.push(
               context,
               MaterialPageRoute(

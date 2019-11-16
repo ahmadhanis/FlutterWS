@@ -1,1 +1,0 @@
-myhelper php directories

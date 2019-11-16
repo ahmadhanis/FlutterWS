@@ -118,7 +118,7 @@ void loadpref(BuildContext ctx) async {
     _onLogin(_email,_password,ctx);
   }else{
      //login as unregistered user
-     User user = new User(name:"not registered",email: "not registered",phone:"not registered",radius: "10",credit: "0",rating: "0");
+          User user = new User(name:"not register",email: "user@noregister",phone:"not register",radius: "15",credit: "0",rating: "0");
           Navigator.push(
               ctx,
               MaterialPageRoute(
@@ -138,6 +138,7 @@ bool _isEmailValid(String email) {
         print(res.statusCode);
         var string = res.body;
         List dres = string.split(",");
+        print("SPLASH:loading");
         print(dres);
         if (dres[0] == "success") {
           User user = new User(name:dres[1],email: dres[2],phone:dres[3],radius: dres[4],credit: dres[5],rating: dres[6]);
@@ -147,7 +148,7 @@ bool _isEmailValid(String email) {
                   builder: (context) => MainScreen(user: user)));
         } else {
           //allow login as unregistered user
-          User user = new User(name:"not registered",email: "not registered",phone:"not registered",radius: "10",credit: "0");
+          User user = new User(name:"not register",email: "user@noregister",phone:"not register",radius: "15",credit: "0",rating: "0");
           Navigator.push(
               ctx,
               MaterialPageRoute(

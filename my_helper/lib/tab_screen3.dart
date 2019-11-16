@@ -6,6 +6,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:flutter/services.dart';
 import 'package:my_helper/user.dart';
 import 'package:progress_dialog/progress_dialog.dart';
+import 'package:toast/toast.dart';
 
 double perpage = 1;
 
@@ -306,8 +307,13 @@ class _TabScreen3State extends State<TabScreen3> {
   }
 
   Future init() async {
-    this.makeRequest();
-    //_getCurrentLocation();
+    if (widget.user.email=="user@noregister"){
+      Toast.show("Please register to view accepted Jobs", context,
+          duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+      return;
+    }else{
+      this.makeRequest();
+    }
   }
 
   Future<Null> refreshList() async {

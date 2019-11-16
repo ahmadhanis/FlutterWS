@@ -1,33 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:my_helper/tab_screen2.dart';
 import 'package:my_helper/tab_screen3.dart';
+import 'package:my_helper/tab_screen4.dart';
 import 'package:my_helper/user.dart';
 import 'tab_screen.dart';
 
-
 class MainScreen extends StatefulWidget {
   final User user;
- 
- const MainScreen({Key key,this.user}) : super(key: key);
+
+  const MainScreen({Key key, this.user}) : super(key: key);
 
   @override
   _MainScreenState createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
- List<Widget> tabs;
+  List<Widget> tabs;
 
- int currentTabIndex = 0;
+  int currentTabIndex = 0;
 
- @override
+  @override
   void initState() {
     super.initState();
     tabs = [
-      TabScreen(user:widget.user),
-      TabScreen2(user:widget.user),
-      TabScreen3(user:widget.user),
-      TabScreen3(user:widget.user),
-      TabScreen3(user:widget.user),
+      TabScreen(user: widget.user),
+      TabScreen2(user: widget.user),
+      TabScreen3(user: widget.user),
+      TabScreen4(user: widget.user),
     ];
   }
 
@@ -48,33 +47,27 @@ class _MainScreenState extends State<MainScreen> {
         onTap: onTapped,
         currentIndex: currentTabIndex,
         //backgroundColor: Colors.blueGrey,
-        type: BottomNavigationBarType.fixed ,
-        
+        type: BottomNavigationBarType.fixed,
+
         items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.search,color: Color.fromRGBO(159, 30, 99, 1)),
+            icon: Icon(Icons.search, color: Color.fromRGBO(159, 30, 99, 1)),
             title: Text("Jobs"),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.list,color: Color.fromRGBO(159, 30, 99, 1)),
+            icon: Icon(Icons.list, color: Color.fromRGBO(159, 30, 99, 1)),
             title: Text("Posted Jobs"),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.event,color: Color.fromRGBO(159, 30, 99, 1)),
+            icon: Icon(Icons.event, color: Color.fromRGBO(159, 30, 99, 1)),
             title: Text("My Jobs"),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.mail,color: Color.fromRGBO(159, 30, 99, 1)),
-            title: Text("Messages"),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person,color: Color.fromRGBO(159, 30, 99, 1)),
+            icon: Icon(Icons.person, color: Color.fromRGBO(159, 30, 99, 1)),
             title: Text("Profile"),
           )
         ],
       ),
     );
   }
-
-  
 }

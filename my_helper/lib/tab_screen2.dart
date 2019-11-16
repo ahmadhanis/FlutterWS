@@ -321,8 +321,13 @@ class _TabScreen2State extends State<TabScreen2> {
   }
 
   Future init() async {
-    this.makeRequest();
-    //_getCurrentLocation();
+    if (widget.user.email=="user@noregister"){
+      Toast.show("Please register to view posted jobs", context,
+          duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+      return;
+    }else{
+      this.makeRequest();
+    }
   }
 
   Future<Null> refreshList() async {
@@ -333,7 +338,7 @@ class _TabScreen2State extends State<TabScreen2> {
 
   void requestNewJob() {
     print(widget.user.email);
-    if (widget.user.email != "NOT REGISTERED") {
+    if (widget.user.email != "user@noregister") {
       Navigator.push(
           context,
           MaterialPageRoute(
