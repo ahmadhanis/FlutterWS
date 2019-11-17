@@ -38,7 +38,7 @@ class _TabScreen4State extends State<TabScreen4> {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
-        SystemUiOverlayStyle(statusBarColor: Color.fromRGBO(159, 30, 99, 1)));
+        SystemUiOverlayStyle(statusBarColor: Colors.deepOrange));
     return MaterialApp(
         debugShowCheckedModeBanner: false,
         home: Scaffold(
@@ -100,7 +100,7 @@ class _TabScreen4State extends State<TabScreen4> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
                                   Icon(Icons.rate_review,
-                                      color: Color.fromRGBO(159, 30, 99, 1)),
+                                      ),
                                   SizedBox(
                                     width: 5,
                                   ),
@@ -124,8 +124,7 @@ class _TabScreen4State extends State<TabScreen4> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: <Widget>[
                                       Icon(Icons.rounded_corner,
-                                          color:
-                                              Color.fromRGBO(159, 30, 99, 1)),
+                                          ),
                                       Text("Job Radius " +
                                               widget.user.radius +
                                               "KM" ??
@@ -140,8 +139,7 @@ class _TabScreen4State extends State<TabScreen4> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: <Widget>[
                                       Icon(Icons.credit_card,
-                                          color:
-                                              Color.fromRGBO(159, 30, 99, 1)),
+                                          ),
                                       SizedBox(
                                         width: 5,
                                       ),
@@ -160,7 +158,7 @@ class _TabScreen4State extends State<TabScreen4> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
                                     Icon(Icons.location_on,
-                                        color: Color.fromRGBO(159, 30, 99, 1)),
+                                       ),
                                     SizedBox(
                                       width: 5,
                                     ),
@@ -174,7 +172,7 @@ class _TabScreen4State extends State<TabScreen4> {
                                 height: 5,
                               ),
                               Container(
-                                color: Color.fromRGBO(159, 30, 99, 1),
+                                color: Colors.deepOrange,
                                 child: Center(
                                   child: Text("My Profile ",
                                       style: TextStyle(

@@ -34,13 +34,13 @@ class _RegisterUserState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
-        SystemUiOverlayStyle(statusBarColor: Color.fromRGBO(159, 30, 99, 1)));
+        SystemUiOverlayStyle(statusBarColor: Colors.deepOrange));
     return WillPopScope(
       onWillPop: _onBackPressAppBar,
       child: Scaffold(
         resizeToAvoidBottomPadding: false,
         appBar: AppBar(
-          backgroundColor: Color.fromRGBO(159, 30, 99, 1),
+          backgroundColor: Colors.deepOrange,
           title: Text('New User Registration'),
         ),
         body: SingleChildScrollView(
@@ -128,7 +128,7 @@ class RegisterWidgetState extends State<RegisterWidget> {
           minWidth: 300,
           height: 50,
           child: Text('Register'),
-          color: Color.fromRGBO(159, 30, 99, 1),
+          color: Colors.deepOrange,
           textColor: Colors.white,
           elevation: 15,
           onPressed: _onRegister,

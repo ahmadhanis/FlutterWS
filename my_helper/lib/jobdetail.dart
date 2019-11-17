@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -21,13 +22,15 @@ class JobDetail extends StatefulWidget {
 class _JobDetailState extends State<JobDetail> {
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+        SystemUiOverlayStyle(statusBarColor: Colors.deepOrange));
     return WillPopScope(
       onWillPop: _onBackPressAppBar,
       child: Scaffold(
           resizeToAvoidBottomPadding: false,
           appBar: AppBar(
             title: Text('JOB DETAILS'),
-            backgroundColor: Color.fromRGBO(159, 30, 99, 1),
+            backgroundColor: Colors.deepOrange,
           ),
           body: SingleChildScrollView(
             child: Container(
@@ -151,7 +154,7 @@ class _DetailInterfaceState extends State<DetailInterface> {
                     'ACCEPT JOB',
                     style: TextStyle(fontSize: 16),
                   ),
-                  color: Color.fromRGBO(159, 30, 99, 1),
+                  color: Colors.deepOrangeAccent,
                   textColor: Colors.white,
                   elevation: 5,
                   onPressed: _onAcceptJob,

@@ -38,8 +38,8 @@ class _TabScreenState extends State<TabScreen> {
   @override
   Widget build(BuildContext context) {
     
-    SystemChrome.setSystemUIOverlayStyle(
-        SystemUiOverlayStyle(statusBarColor: Color.fromRGBO(159, 30, 99, 1)));
+   SystemChrome.setSystemUIOverlayStyle(
+        SystemUiOverlayStyle(statusBarColor: Colors.deepOrange));
     return MaterialApp(
         debugShowCheckedModeBanner: false,
         home: Scaffold(
@@ -47,7 +47,7 @@ class _TabScreenState extends State<TabScreen> {
            
             body: RefreshIndicator(
               key: refreshKey,
-              color: Color.fromRGBO(159, 30, 99, 1),
+              color: Colors.deepOrange,
               onRefresh: () async {
                 await refreshList();
               },
@@ -90,8 +90,7 @@ class _TabScreenState extends State<TabScreen> {
                                             Row(
                                               children: <Widget>[
                                                 Icon(Icons.person,
-                                                    color: Color.fromRGBO(
-                                                        159, 30, 99, 1)),
+                                                    ),
                                                 SizedBox(
                                                   width: 5,
                                                 ),
@@ -110,8 +109,7 @@ class _TabScreenState extends State<TabScreen> {
                                             Row(
                                               children: <Widget>[
                                                 Icon(Icons.location_on,
-                                                    color: Color.fromRGBO(
-                                                        159, 30, 99, 1)),
+                                                    ),
                                                 SizedBox(
                                                   width: 5,
                                                 ),
@@ -123,8 +121,7 @@ class _TabScreenState extends State<TabScreen> {
                                             Row(
                                               children: <Widget>[
                                                 Icon(Icons.rounded_corner,
-                                                    color: Color.fromRGBO(
-                                                        159, 30, 99, 1)),
+                                                    ),
                                                 SizedBox(
                                                   width: 5,
                                                 ),
@@ -139,8 +136,7 @@ class _TabScreenState extends State<TabScreen> {
                                             Row(
                                               children: <Widget>[
                                                 Icon(Icons.credit_card,
-                                                    color: Color.fromRGBO(
-                                                        159, 30, 99, 1)),
+                                                  ),
                                                 SizedBox(
                                                   width: 5,
                                                 ),
@@ -163,7 +159,7 @@ class _TabScreenState extends State<TabScreen> {
                               height: 4,
                             ),
                             Container(
-                              color: Color.fromRGBO(159, 30, 99, 1),
+                              color: Colors.deepOrange,
                               child: Center(
                                 child: Text("Jobs Available Today",
                                     style: TextStyle(
@@ -377,3 +373,4 @@ class _TabScreenState extends State<TabScreen> {
     print("Delete");
   }
 }
+

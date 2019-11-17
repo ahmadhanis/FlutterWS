@@ -40,7 +40,7 @@ class _NewJobState extends State<NewJob> {
           //resizeToAvoidBottomPadding: false,
           appBar: AppBar(
             title: Text('REQUEST HELP'),
-            backgroundColor: Color.fromRGBO(159, 30, 99, 1),
+            backgroundColor: Colors.deepOrange,
           ),
           body: SingleChildScrollView(
             child: Container(
@@ -128,7 +128,6 @@ class _CreateNewJobState extends State<CreateNewJob> {
               alignment: Alignment.topLeft,
               child: Text("Job Location",
                   style: TextStyle(
-                      color: Color.fromRGBO(159, 30, 99, 1),
                       fontWeight: FontWeight.bold)),
             )),
         SizedBox(
@@ -140,7 +139,7 @@ class _CreateNewJobState extends State<CreateNewJob> {
             SizedBox(
               width: 10,
             ),
-            Text(_currentAddress)
+            Flexible(child: Text(_currentAddress),) 
           ],
         ),
         SizedBox(
@@ -152,7 +151,7 @@ class _CreateNewJobState extends State<CreateNewJob> {
           minWidth: 300,
           height: 50,
           child: Text('Request New Job'),
-          color: Color.fromRGBO(159, 30, 99, 1),
+          color: Colors.deepOrangeAccent,
           textColor: Colors.white,
           elevation: 15,
           onPressed: _onAddJob,

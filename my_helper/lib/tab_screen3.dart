@@ -37,7 +37,7 @@ class _TabScreen3State extends State<TabScreen3> {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
-        SystemUiOverlayStyle(statusBarColor: Color.fromRGBO(159, 30, 99, 1)));
+        SystemUiOverlayStyle(statusBarColor: Colors.deepOrange));
     return MaterialApp(
         debugShowCheckedModeBanner: false,
         home: Scaffold(
@@ -87,8 +87,7 @@ class _TabScreen3State extends State<TabScreen3> {
                                             Row(
                                               children: <Widget>[
                                                 Icon(Icons.person,
-                                                    color: Color.fromRGBO(
-                                                        159, 30, 99, 1)),
+                                                    ),
                                                 SizedBox(
                                                   width: 5,
                                                 ),
@@ -107,8 +106,7 @@ class _TabScreen3State extends State<TabScreen3> {
                                             Row(
                                               children: <Widget>[
                                                 Icon(Icons.location_on,
-                                                    color: Color.fromRGBO(
-                                                        159, 30, 99, 1)),
+                                                    ),
                                                 SizedBox(
                                                   width: 5,
                                                 ),
@@ -120,8 +118,7 @@ class _TabScreen3State extends State<TabScreen3> {
                                             Row(
                                               children: <Widget>[
                                                 Icon(Icons.rounded_corner,
-                                                    color: Color.fromRGBO(
-                                                        159, 30, 99, 1)),
+                                                    ),
                                                 SizedBox(
                                                   width: 5,
                                                 ),
@@ -136,8 +133,7 @@ class _TabScreen3State extends State<TabScreen3> {
                                             Row(
                                               children: <Widget>[
                                                 Icon(Icons.credit_card,
-                                                    color: Color.fromRGBO(
-                                                        159, 30, 99, 1)),
+                                                    ),
                                                 SizedBox(
                                                   width: 5,
                                                 ),
@@ -160,7 +156,7 @@ class _TabScreen3State extends State<TabScreen3> {
                               height: 4,
                             ),
                             Container(
-                              color: Color.fromRGBO(159, 30, 99, 1),
+                              color: Colors.deepOrange,
                               child: Center(
                                 child: Text("My Accepted Jobs ",
                                     style: TextStyle(

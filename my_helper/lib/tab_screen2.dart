@@ -9,7 +9,7 @@ import 'package:my_helper/registrationscreen.dart';
 import 'package:my_helper/user.dart';
 import 'package:toast/toast.dart';
 import 'package:progress_dialog/progress_dialog.dart';
-
+import 'package:flutter_slidable/flutter_slidable.dart';
 double perpage = 1;
 
 class TabScreen2 extends StatefulWidget {
@@ -39,21 +39,21 @@ class _TabScreen2State extends State<TabScreen2> {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
-        SystemUiOverlayStyle(statusBarColor: Color.fromRGBO(159, 30, 99, 1)));
+        SystemUiOverlayStyle(statusBarColor: Colors.deepOrange));
     return MaterialApp(
         debugShowCheckedModeBanner: false,
         home: Scaffold(
             resizeToAvoidBottomPadding: false,
             floatingActionButton: FloatingActionButton(
               child: Icon(Icons.add),
-              backgroundColor: Color.fromRGBO(159, 30, 99, 1),
+              backgroundColor: Colors.deepOrange,
               elevation: 2.0,
               onPressed: requestNewJob,
               tooltip: 'Request new help',
             ),
             body: RefreshIndicator(
               key: refreshKey,
-              color: Color.fromRGBO(159, 30, 99, 1),
+              color: Colors.deepOrange,
               onRefresh: () async {
                 await refreshList();
               },
@@ -96,8 +96,7 @@ class _TabScreen2State extends State<TabScreen2> {
                                             Row(
                                               children: <Widget>[
                                                 Icon(Icons.person,
-                                                    color: Color.fromRGBO(
-                                                        159, 30, 99, 1)),
+                                                    ),
                                                 SizedBox(
                                                   width: 5,
                                                 ),
@@ -116,8 +115,7 @@ class _TabScreen2State extends State<TabScreen2> {
                                             Row(
                                               children: <Widget>[
                                                 Icon(Icons.location_on,
-                                                    color: Color.fromRGBO(
-                                                        159, 30, 99, 1)),
+                                                    ),
                                                 SizedBox(
                                                   width: 5,
                                                 ),
@@ -129,8 +127,7 @@ class _TabScreen2State extends State<TabScreen2> {
                                             Row(
                                               children: <Widget>[
                                                 Icon(Icons.rounded_corner,
-                                                    color: Color.fromRGBO(
-                                                        159, 30, 99, 1)),
+                                                    ),
                                                 SizedBox(
                                                   width: 5,
                                                 ),
@@ -145,8 +142,7 @@ class _TabScreen2State extends State<TabScreen2> {
                                             Row(
                                               children: <Widget>[
                                                 Icon(Icons.credit_card,
-                                                    color: Color.fromRGBO(
-                                                        159, 30, 99, 1)),
+                                                    ),
                                                 SizedBox(
                                                   width: 5,
                                                 ),
@@ -169,7 +165,7 @@ class _TabScreen2State extends State<TabScreen2> {
                               height: 4,
                             ),
                             Container(
-                              color: Color.fromRGBO(159, 30, 99, 1),
+                              color: Colors.deepOrange,
                               child: Center(
                                 child: Text("Your Posted Jobs ",
                                     style: TextStyle(
@@ -413,5 +409,91 @@ class _TabScreen2State extends State<TabScreen2> {
       pr.dismiss();
     });
     return null;
+  }
+}
+class SlideMenu extends StatefulWidget {
+  final Widget child;
+  final List<Widget> menuItems;
+
+  SlideMenu({this.child, this.menuItems});
+
+  @override
+  _SlideMenuState createState() => new _SlideMenuState();
+}
+
+class _SlideMenuState extends State<SlideMenu> with SingleTickerProviderStateMixin {
+  AnimationController _controller;
+
+  @override
+  initState() {
+    super.initState();
+    _controller = new AnimationController(vsync: this, duration: const Duration(milliseconds: 200));
+  }
+
+  @override
+  dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final animation = new Tween(
+      begin: const Offset(0.0, 0.0),
+      end: const Offset(-0.2, 0.0)
+    ).animate(new CurveTween(curve: Curves.decelerate).animate(_controller));
+
+    return new GestureDetector(
+      onHorizontalDragUpdate: (data) {
+        // we can access context.size here
+        setState(() {
+          _controller.value -= data.primaryDelta / context.size.width;
+        });
+      },
+      onHorizontalDragEnd: (data) {
+        if (data.primaryVelocity > 2500)
+          _controller.animateTo(.0); //close menu on fast swipe in the right direction
+        else if (_controller.value >= .5 || data.primaryVelocity < -2500) // fully open if dragged a lot to left or on fast swipe to left
+          _controller.animateTo(1.0);
+        else // close if none of above
+          _controller.animateTo(.0);
+      },
+      child: new Stack(
+        children: <Widget>[
+          new SlideTransition(position: animation, child: widget.child),
+          new Positioned.fill(
+            child: new LayoutBuilder(
+              builder: (context, constraint) {
+                return new AnimatedBuilder(
+                  animation: _controller,
+                  builder: (context, child) {
+                    return new Stack(
+                      children: <Widget>[
+                        new Positioned(
+                          right: .0,
+                          top: .0,
+                          bottom: .0,
+                          width: constraint.maxWidth * animation.value.dx * -1,
+                          child: new Container(
+                            color: Colors.black26,
+                            child: new Row(
+                              children: widget.menuItems.map((child) {
+                                return new Expanded(
+                                  child: child,
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
+          )
+        ],
+      ),
+    );
   }
 }

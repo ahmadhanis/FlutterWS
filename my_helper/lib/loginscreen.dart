@@ -42,7 +42,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
-        SystemUiOverlayStyle(statusBarColor: Color.fromRGBO(159, 30, 99, 1)));
+        SystemUiOverlayStyle(statusBarColor: Colors.deepOrangeAccent));
     return WillPopScope(
         onWillPop: _onBackPressAppBar,
         child: Scaffold(
@@ -53,7 +53,7 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Image.asset(
-                  'assets/images/splash.png',
+                  'assets/images/myhelper.png',
                   scale: 3,
                 ),
                 TextField(
@@ -76,7 +76,7 @@ class _LoginPageState extends State<LoginPage> {
                   minWidth: 300,
                   height: 50,
                   child: Text('Login'),
-                  color: Color.fromRGBO(159, 30, 99, 1),
+                  color: Colors.deepOrange,
                   textColor: Colors.white,
                   elevation: 15,
                   onPressed: _onLogin,

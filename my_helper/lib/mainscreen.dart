@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:my_helper/tab_screen2.dart';
 import 'package:my_helper/tab_screen3.dart';
 import 'package:my_helper/tab_screen4.dart';
@@ -41,6 +42,8 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     //SystemChrome.setEnabledSystemUIOverlays([]);
+    SystemChrome.setSystemUIOverlayStyle(
+        SystemUiOverlayStyle(statusBarColor: Colors.deepOrange));
     return Scaffold(
       body: tabs[currentTabIndex],
       bottomNavigationBar: BottomNavigationBar(
@@ -51,19 +54,19 @@ class _MainScreenState extends State<MainScreen> {
 
         items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.search, color: Color.fromRGBO(159, 30, 99, 1)),
+            icon: Icon(Icons.search),
             title: Text("Jobs"),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.list, color: Color.fromRGBO(159, 30, 99, 1)),
+            icon: Icon(Icons.list, ),
             title: Text("Posted Jobs"),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.event, color: Color.fromRGBO(159, 30, 99, 1)),
+            icon: Icon(Icons.event, ),
             title: Text("My Jobs"),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person, color: Color.fromRGBO(159, 30, 99, 1)),
+            icon: Icon(Icons.person, ),
             title: Text("Profile"),
           )
         ],
