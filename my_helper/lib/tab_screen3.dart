@@ -192,14 +192,17 @@ class _TabScreen3State extends State<TabScreen3> {
                             padding: const EdgeInsets.all(2.0),
                             child: Row(
                               children: <Widget>[
-                                Container(
+                                 Container(
                                   height: 100,
                                   width: 100,
-                                  child: Image.network(
-                                    "http://slumberjer.com/myhelper/images/${data[index]['jobimage']}.jpg",
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                      border: Border.all(color: Colors.white),
+                                      image: DecorationImage(
                                     fit: BoxFit.fill,
-                                  ),
-                                ),
+                                    image: NetworkImage(
+                                    "http://slumberjer.com/myhelper/images/${data[index]['jobimage']}.jpg"
+                                  )))),
                                 Expanded(
                                   child: Container(
                                     child: Column(

@@ -54,7 +54,7 @@ class _LoginPageState extends State<LoginPage> {
               children: <Widget>[
                 Image.asset(
                   'assets/images/myhelper.png',
-                  scale: 3,
+                  scale: 3.5,
                 ),
                 TextField(
                     controller: _emcontroller,

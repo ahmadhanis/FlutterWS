@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:my_helper/job.dart';
@@ -6,8 +7,12 @@ import 'dart:convert';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/services.dart';
+import 'package:my_helper/mainscreen.dart';
 import 'package:my_helper/user.dart';
 import 'package:progress_dialog/progress_dialog.dart';
+
+import 'SlideRightRoute.dart';
+import 'enterexit.dart';
 
 double perpage = 1;
 
@@ -214,11 +219,14 @@ class _TabScreenState extends State<TabScreen> {
                                 Container(
                                   height: 100,
                                   width: 100,
-                                  child: Image.network(
-                                    "http://slumberjer.com/myhelper/images/${data[index]['jobimage']}.jpg",
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                      border: Border.all(color: Colors.white),
+                                      image: DecorationImage(
                                     fit: BoxFit.fill,
-                                  ),
-                                ),
+                                    image: NetworkImage(
+                                    "http://slumberjer.com/myhelper/images/${data[index]['jobimage']}.jpg"
+                                  )))),
                                 Expanded(
                                   child: Container(
                                     child: Column(
@@ -362,11 +370,8 @@ class _TabScreenState extends State<TabScreen> {
         joblon: joblongitude,
         jobrating:jobrating );
     //print(data);
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (BuildContext context) =>
-                JobDetail(job: job, user: widget.user)));
+    
+    Navigator.push(context, SlideRightRoute(page: JobDetail(job: job, user: widget.user)));
   }
 
   void _onJobDelete() {

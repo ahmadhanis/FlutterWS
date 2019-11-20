@@ -1,16 +1,27 @@
+import 'dart:io';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/services.dart';
+import 'package:my_helper/loginscreen.dart';
+import 'package:my_helper/registrationscreen.dart';
 import 'package:my_helper/splashscreen.dart';
 import 'package:my_helper/user.dart';
-import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
+import 'package:image_picker/image_picker.dart';
+
+import 'mainscreen.dart';
 
 String urlgetuser = "http://slumberjer.com/myhelper/php/get_user.php";
+String urluploadImage =
+    "http://slumberjer.com/myhelper/php/upload_imageprofile.php";
+String urlupdate = "http://slumberjer.com/myhelper/php/update_profile.php";
+File _image;
+int number = 0;
 
 class TabScreen4 extends StatefulWidget {
   //final String email;
@@ -66,18 +77,21 @@ class _TabScreen4State extends State<TabScreen4> {
                                         color: Colors.white)),
                               ),
                               SizedBox(
-                                height: 10,
+                                height: 5,
                               ),
-                              Container(
-                                  width: 150.0,
-                                  height: 150.0,
-                                  decoration: new BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      border: Border.all(color: Colors.white),
-                                      image: new DecorationImage(
-                                          fit: BoxFit.fill,
-                                          image: new NetworkImage(
-                                              "http://slumberjer.com/myhelper/profile/${widget.user.email}.jpg")))),
+                              GestureDetector(
+                                onTap: _takePicture,
+                                child: Container(
+                                    width: 150.0,
+                                    height: 150.0,
+                                    decoration: new BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: Border.all(color: Colors.white),
+                                        image: new DecorationImage(
+                                            fit: BoxFit.cover,
+                                            image: new NetworkImage(
+                                                "http://slumberjer.com/myhelper/profile/${widget.user.email}.jpg?dummy=${(number)}'")))),
+                              ),
                               SizedBox(height: 5),
                               Container(
                                 child: Text(
@@ -96,11 +110,26 @@ class _TabScreen4State extends State<TabScreen4> {
                                       fontSize: 14),
                                 ),
                               ),
+                              Column(
+                                children: <Widget>[
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Icon(
+                                        Icons.phone_android,
+                                      ),
+                                      Text(widget.user.phone??
+                                          'not registered'),
+                                    ],
+                                  ),
+                                ],
+                              ),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
-                                  Icon(Icons.rate_review,
-                                      ),
+                                  Icon(
+                                    Icons.rate_review,
+                                  ),
                                   SizedBox(
                                     width: 5,
                                   ),
@@ -123,8 +152,9 @@ class _TabScreen4State extends State<TabScreen4> {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: <Widget>[
-                                      Icon(Icons.rounded_corner,
-                                          ),
+                                      Icon(
+                                        Icons.rounded_corner,
+                                      ),
                                       Text("Job Radius " +
                                               widget.user.radius +
                                               "KM" ??
@@ -138,8 +168,9 @@ class _TabScreen4State extends State<TabScreen4> {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: <Widget>[
-                                      Icon(Icons.credit_card,
-                                          ),
+                                      Icon(
+                                        Icons.credit_card,
+                                      ),
                                       SizedBox(
                                         width: 5,
                                       ),
@@ -157,8 +188,9 @@ class _TabScreen4State extends State<TabScreen4> {
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
-                                    Icon(Icons.location_on,
-                                       ),
+                                    Icon(
+                                      Icons.location_on,
+                                    ),
                                     SizedBox(
                                       width: 5,
                                     ),
@@ -205,19 +237,23 @@ class _TabScreen4State extends State<TabScreen4> {
                           onPressed: _changePassword,
                           child: Text("CHANGE PASSWORD"),
                         ),
-                        MaterialButton(onPressed: _changePhone,
+                        MaterialButton(
+                          onPressed: _changePhone,
                           child: Text("CHANGE PHONE"),
                         ),
                         MaterialButton(
+                          onPressed: _changeRadius,
                           child: Text("CHANGE RADIUS"),
                         ),
                         MaterialButton(
                           child: Text("BUY CREDIT"),
                         ),
                         MaterialButton(
+                          onPressed: _registerAccount,
                           child: Text("REGISTER"),
                         ),
                         MaterialButton(
+                          onPressed: _gotologinPage,
                           child: Text("LOG IN"),
                         ),
                         MaterialButton(
@@ -230,6 +266,57 @@ class _TabScreen4State extends State<TabScreen4> {
                 }
               }),
         ));
+  }
+
+  void _takePicture() async {
+    if (widget.user.name == "not register") {
+      Toast.show("Not allowed", context,
+          duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+      return;
+    }
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Take new profile picture?"),
+          content: new Text("Are your sure?"),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Yes"),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                _image =
+                    await ImagePicker.pickImage(source: ImageSource.camera);
+
+                String base64Image = base64Encode(_image.readAsBytesSync());
+                http.post(urluploadImage, body: {
+                  "encoded_string": base64Image,
+                  "email": widget.user.email,
+                }).then((res) {
+                  print(res.body);
+                  if (res.body == "success") {
+                    setState(() {
+                      number = new Random().nextInt(100);
+                      print(number);
+                    });
+                  } else {}
+                }).catchError((err) {
+                  print(err);
+                });
+              },
+            ),
+            new FlatButton(
+              child: new Text("No"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   _getCurrentLocation() async {
@@ -263,7 +350,65 @@ class _TabScreen4State extends State<TabScreen4> {
     }
   }
 
-  void _changeRadius() {}
+  void _changeRadius() {
+    TextEditingController radiusController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Change new Radius (km)?"),
+          content: new TextField(
+              keyboardType: TextInputType.phone,
+              controller: radiusController,
+              decoration: InputDecoration(
+                labelText: 'new radius',
+                icon: Icon(Icons.map),
+              )),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Yes"),
+              onPressed: () {
+                if (radiusController.text.length < 1) {
+                  Toast.show("Please enter new radius ", context,
+                      duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+                  return;
+                }
+                http.post(urlupdate, body: {
+                  "email": widget.user.email,
+                  "radius": radiusController.text,
+                }).then((res) {
+                  var string = res.body;
+                  List dres = string.split(",");
+                  if (dres[0] == "success") {
+                    setState(() {
+                      widget.user.radius = dres[4];
+                      Toast.show("Success ", context,
+                          duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+                      Navigator.of(context).pop();
+                      return;
+                    });
+                  } else {}
+                }).catchError((err) {
+                  print(err);
+                });
+                Toast.show("Failed ", context,
+                    duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+              },
+            ),
+            new FlatButton(
+              child: new Text("No"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   void _logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -277,12 +422,13 @@ class _TabScreen4State extends State<TabScreen4> {
   void _changeName() {
     TextEditingController nameController = TextEditingController();
     // flutter defined function
-    print(widget.user.name);
+
     if (widget.user.name == "not register") {
       Toast.show("Not allowed", context,
           duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       return;
     }
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -300,11 +446,32 @@ class _TabScreen4State extends State<TabScreen4> {
             new FlatButton(
               child: new Text("Yes"),
               onPressed: () {
+                if (nameController.text.length < 5) {
+                  Toast.show(
+                      "Name should be more than 5 characters long", context,
+                      duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+                  return;
+                }
+                http.post(urlupdate, body: {
+                  "email": widget.user.email,
+                  "name": nameController.text,
+                }).then((res) {
+                  var string = res.body;
+                  List dres = string.split(",");
+                  if (dres[0] == "success") {
+                    print('in success');
+                    setState(() {
+                      widget.user.name = dres[1];
+                      if (dres[0] == "success") {
+                        print("in setstate");
+                        widget.user.name = dres[1];
+                      }
+                    });
+                  } else {}
+                }).catchError((err) {
+                  print(err);
+                });
                 Navigator.of(context).pop();
-                print(
-                  nameController.text,
-                );
-                //deleteRequest(jobid);
               },
             ),
             new FlatButton(
@@ -347,11 +514,33 @@ class _TabScreen4State extends State<TabScreen4> {
             new FlatButton(
               child: new Text("Yes"),
               onPressed: () {
-                Navigator.of(context).pop();
-                print(
-                  passController.text,
-                );
-                //deleteRequest(jobid);
+                if (passController.text.length < 5) {
+                  Toast.show("Password too short", context,
+                      duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+                  return;
+                }
+                http.post(urlupdate, body: {
+                  "email": widget.user.email,
+                  "password": passController.text,
+                }).then((res) {
+                  var string = res.body;
+                  List dres = string.split(",");
+                  if (dres[0] == "success") {
+                    print('in success');
+                    setState(() {
+                      widget.user.name = dres[1];
+                      if (dres[0] == "success") {
+                        Toast.show("Success", context,
+                            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+                            savepref(passController.text);
+                            Navigator.of(context).pop();
+                      }
+                    });
+                  } else {}
+                }).catchError((err) {
+                  print(err);
+                });
+                
               },
             ),
             new FlatButton(
@@ -382,7 +571,7 @@ class _TabScreen4State extends State<TabScreen4> {
         return AlertDialog(
           title: new Text("Change phone for" + widget.user.name),
           content: new TextField(
-            keyboardType: TextInputType.phone,
+              keyboardType: TextInputType.phone,
               controller: phoneController,
               decoration: InputDecoration(
                 labelText: 'phone',
@@ -393,11 +582,30 @@ class _TabScreen4State extends State<TabScreen4> {
             new FlatButton(
               child: new Text("Yes"),
               onPressed: () {
-                Navigator.of(context).pop();
-                print(
-                  phoneController.text,
-                );
-                //deleteRequest(jobid);
+                if (phoneController.text.length < 5) {
+                  Toast.show("Please enter correct phone number", context,
+                      duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+                      return;
+                }
+                http.post(urlupdate, body: {
+                  "email": widget.user.email,
+                  "phone": phoneController.text,
+                }).then((res) {
+                  var string = res.body;
+                  List dres = string.split(",");
+                  if (dres[0] == "success") {
+                    setState(() {
+                      widget.user.phone = dres[3];
+                      Toast.show("Success ", context,
+                          duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+                      Navigator.of(context).pop();
+                      return;
+                    });
+                  }
+                  
+                }).catchError((err) {
+                  print(err);
+                });
               },
             ),
             new FlatButton(
@@ -410,5 +618,87 @@ class _TabScreen4State extends State<TabScreen4> {
         );
       },
     );
+  }
+
+  void _registerAccount() {
+    TextEditingController phoneController = TextEditingController();
+    // flutter defined function
+    print(widget.user.name);
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Register new account?"),
+          content: new Text("Are your sure?"),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Yes"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                print(
+                  phoneController.text,
+                );
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext context) => RegisterScreen()));
+              },
+            ),
+            new FlatButton(
+              child: new Text("No"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _gotologinPage() {
+    TextEditingController phoneController = TextEditingController();
+    // flutter defined function
+    print(widget.user.name);
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Go to login page?" + widget.user.name),
+          content: new Text("Are your sure?"),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Yes"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                print(
+                  phoneController.text,
+                );
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext context) => LoginPage()));
+              },
+            ),
+            new FlatButton(
+              child: new Text("No"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void savepref(String pass) async {
+    print('Inside savepref');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('pass', pass);
   }
 }

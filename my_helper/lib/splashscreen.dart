@@ -80,13 +80,8 @@ class _ProgressIndicatorState extends State<ProgressIndicator>
   Widget build(BuildContext context) {
     return new Center(
         child: new Container(
-      width: 200,
-      color: Colors.teal,
-      child: LinearProgressIndicator(
-        value: animation.value,
-        backgroundColor: Colors.black,
-        valueColor:
-            new AlwaysStoppedAnimation<Color>(Color.fromRGBO(241, 92, 39, 1)),
+      child: CircularProgressIndicator(
+        
       ),
     ));
   }
@@ -95,12 +90,12 @@ class _ProgressIndicatorState extends State<ProgressIndicator>
 void loadpref(BuildContext ctx) async {
   print('Inside loadpref()');
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  _email = (prefs.getString('email'));
-  _password = (prefs.getString('pass'));
+  _email = (prefs.getString('email')??'');
+  _password = (prefs.getString('pass')??'');
   print("Splash:Preference");
   print(_email);
   print(_password);
-  if (_isEmailValid(_email)) {
+  if (_isEmailValid(_email??"no email")) {
     //try to login if got email;
     _onLogin(_email, _password, ctx);
   } else {

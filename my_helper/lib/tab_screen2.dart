@@ -9,7 +9,6 @@ import 'package:my_helper/registrationscreen.dart';
 import 'package:my_helper/user.dart';
 import 'package:toast/toast.dart';
 import 'package:progress_dialog/progress_dialog.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 double perpage = 1;
 
 class TabScreen2 extends StatefulWidget {
@@ -32,6 +31,7 @@ class _TabScreen2State extends State<TabScreen2> {
   @override
   void initState() {
     super.initState();
+    //init();
     refreshKey = GlobalKey<RefreshIndicatorState>();
     _getCurrentLocation();
   }
@@ -204,14 +204,17 @@ class _TabScreen2State extends State<TabScreen2> {
                             padding: const EdgeInsets.all(2.0),
                             child: Row(
                               children: <Widget>[
-                                Container(
+                                 Container(
                                   height: 100,
                                   width: 100,
-                                  child: Image.network(
-                                    "http://slumberjer.com/myhelper/images/${data[index]['jobimage']}.jpg",
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                      border: Border.all(color: Colors.white),
+                                      image: DecorationImage(
                                     fit: BoxFit.fill,
-                                  ),
-                                ),
+                                    image: NetworkImage(
+                                    "http://slumberjer.com/myhelper/images/${data[index]['jobimage']}.jpg"
+                                  )))),
                                 Expanded(
                                   child: Container(
                                     child: Column(
@@ -291,15 +294,13 @@ class _TabScreen2State extends State<TabScreen2> {
 
   Future<String> makeRequest() async {
     String urlLoadJobs = "http://slumberjer.com/myhelper/php/load_job_user.php";
-    ProgressDialog pr = new ProgressDialog(context,
+     ProgressDialog pr = new ProgressDialog(context,
         type: ProgressDialogType.Normal, isDismissible: false);
-    pr.style(message: "Loading Jobs");
+        pr.style(message: "Loading All Accepted Jobs");
     pr.show();
     http.post(urlLoadJobs, body: {
       "email": widget.user.email ?? "notavail",
-      "latitude": _currentPosition.latitude.toString(),
-      "longitude": _currentPosition.longitude.toString(),
-      "radius": widget.user.radius ?? "10",
+
     }).then((res) {
       setState(() {
         var extractdata = json.decode(res.body);
