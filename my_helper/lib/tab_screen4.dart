@@ -17,7 +17,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:random_string/random_string.dart';
 
-
 String urlgetuser = "http://slumberjer.com/myhelper/php/get_user.php";
 String urluploadImage =
     "http://slumberjer.com/myhelper/php/upload_imageprofile.php";
@@ -765,13 +764,25 @@ class _TabScreen4State extends State<TabScreen4> {
             new FlatButton(
               child: new Text("Yes"),
               onPressed: () async {
-                Navigator.of(context).pop();
                 var now = new DateTime.now();
                 var formatter = new DateFormat('ddMMyyyyhhmmss-');
-                String formatted = formatter.format(now)+randomAlphaNumeric(10);
-                print(formatted);
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => PaymentScreen(user:widget.user,orderid:formatted, val:_value)));
+                String formatted =
+                    formatter.format(now) + randomAlphaNumeric(10);
+                print(_value);
+                if (_value == null) {
+                  Toast.show("Please select credit value", context,
+                      duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+                  return;
+                } else {
+                  Navigator.of(context).pop();
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => PaymentScreen(
+                              user: widget.user,
+                              orderid: formatted,
+                              val: _value)));
+                }
               },
             ),
             new FlatButton(

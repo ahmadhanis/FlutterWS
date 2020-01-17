@@ -13,7 +13,7 @@
         android:name="io.flutter.app.FlutterApplication"
         android:label="my_helper"
         android:usesCleartextTraffic="true"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/myhelper">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

@@ -49,7 +49,13 @@ class _TabScreenState extends State<TabScreen> {
         debugShowCheckedModeBanner: false,
         home: Scaffold(
             resizeToAvoidBottomPadding: false,
-           
+           floatingActionButton: FloatingActionButton(
+              child: Icon(Icons.search),
+              backgroundColor: Colors.deepOrange,
+              elevation: 2.0,
+              onPressed: _searchJob,
+              tooltip: 'Search Job',
+            ),
             body: RefreshIndicator(
               key: refreshKey,
               color: Colors.deepOrange,
@@ -376,6 +382,78 @@ class _TabScreenState extends State<TabScreen> {
 
   void _onJobDelete() {
     print("Delete");
+  }
+
+  void _searchJob() {
+    TextEditingController phoneController = TextEditingController();
+    // flutter defined function
+    print(widget.user.name);
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Select Job Type?"),
+          content: new SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: <Widget>[
+              new IconButton(
+                  iconSize: 40,
+                  icon: new Icon(Icons.directions_bike),
+                  onPressed: null),
+              new IconButton(
+                  iconSize: 40,
+                  icon: new Icon(Icons.fastfood),
+                  onPressed: null),
+              new IconButton(
+                  iconSize: 40,
+                  icon: new Icon(Icons.local_laundry_service),
+                  onPressed: null),
+              new IconButton(
+                  iconSize: 40,
+                  icon: new Icon(Icons.computer),
+                  onPressed: null),
+              new IconButton(
+                  iconSize: 40,
+                  icon: new Icon(Icons.local_grocery_store),
+                  onPressed: null),
+              new IconButton(
+                  iconSize: 40,
+                  icon: new Icon(Icons.card_travel),
+                  onPressed: null),
+              new IconButton(
+                  iconSize: 40,
+                  icon: new Icon(Icons.directions_bike),
+                  onPressed: null),
+              new IconButton(
+                  iconSize: 40,
+                  icon: new Icon(Icons.directions_bike),
+                  onPressed: null),
+            ],
+          ),
+        ),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Yes"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                print(
+                  phoneController.text,
+                );
+              },
+            ),
+            new FlatButton(
+              child: new Text("No"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }
 
