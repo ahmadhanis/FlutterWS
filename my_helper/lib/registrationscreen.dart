@@ -128,7 +128,7 @@ class RegisterWidgetState extends State<RegisterWidget> {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
           minWidth: 300,
           height: 50,
-          child: Text('Register'),
+          child: Text('REGISTER'),
           color: Colors.deepOrange,
           textColor: Colors.white,
           elevation: 15,

@@ -1,0 +1,77 @@
+{
+  "project_info": {
+    "project_number": "623658124095",
+    "firebase_url": "https://iotmessagebox.firebaseio.com",
+    "project_id": "iotmessagebox",
+    "storage_bucket": "iotmessagebox.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:623658124095:android:d57b78af0c9539f703098a",
+        "android_client_info": {
+          "package_name": "com.example.smartmessageboard"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "623658124095-ncpf3t11s8oimo0l43hf53v1l8ssud99.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCC64qYRwVLmHe269OjSusKqKWBRg6uJf4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "623658124095-ncpf3t11s8oimo0l43hf53v1l8ssud99.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:623658124095:android:47984b4d7bad9c4a03098a",
+        "android_client_info": {
+          "package_name": "com.slumberjer.iotmessageboard"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "623658124095-h52cvp795qvhiqqnc3eflqq7eiv9v4u5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.slumberjer.iotmessageboard",
+            "certificate_hash": "6d79474444cf9522f15bbbbdfdff039105463aaf"
+          }
+        },
+        {
+          "client_id": "623658124095-ncpf3t11s8oimo0l43hf53v1l8ssud99.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCC64qYRwVLmHe269OjSusKqKWBRg6uJf4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "623658124095-ncpf3t11s8oimo0l43hf53v1l8ssud99.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
