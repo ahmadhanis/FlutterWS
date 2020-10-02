@@ -19,7 +19,6 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   double screenHeight, screenWidth;
-  bool _isChecked = false;
   File _image;
   Position _currentPosition;
   double latitude, longitude;
@@ -232,42 +231,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     icon: Icon(MdiIcons.officeBuilding),
                   )),
               SizedBox(
-                height: 5,
+                height: 10,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Checkbox(
-                    value: _isChecked,
-                    onChanged: (bool value) {
-                      _onChange(value);
-                    },
-                  ),
-                  Flexible(
-                      child: GestureDetector(
-                    onTap: _showEULA,
-                    child: Text('Saya setuju syarat  ',
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white)),
-                  )),
-                  Flexible(
-                      child: MaterialButton(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5.0)),
-                    minWidth: screenWidth / 6,
-                    height: 50,
-                    child: Text('Daftar'),
-                    color: Color.fromRGBO(101, 255, 218, 50),
-                    textColor: Colors.black,
-                    elevation: 10,
-                    onPressed: _onRegister,
-                  )),
-                  SizedBox(
-                    height: 10,
-                  ),
-                ],
+              MaterialButton(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5.0)),
+                minWidth: screenWidth / 1,
+                height: 50,
+                child: Text('Daftar'),
+                color: Color.fromRGBO(101, 255, 218, 50),
+                textColor: Colors.black,
+                elevation: 10,
+                onPressed: _onRegister,
+              ),
+              SizedBox(
+                height: 5,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -420,11 +398,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           duration: Toast.LENGTH_LONG, gravity: Toast.TOP);
       return;
     }
-    if (!_isChecked) {
-      Toast.show("Sila terima terma", context,
-          duration: Toast.LENGTH_LONG, gravity: Toast.TOP);
-      return;
-    }
 
     if (latitude == null && longitude == null) {
       _getLocation();
@@ -536,62 +509,55 @@ class _RegisterScreenState extends State<RegisterScreen> {
         MaterialPageRoute(builder: (BuildContext context) => MainScreen()));
   }
 
-  void _onChange(bool value) {
-    setState(() {
-      _isChecked = value;
-      //savepref(value);
-    });
-  }
-
-  void _showEULA() {
-    // flutter defined function
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        // return object of type Dialog
-        return AlertDialog(
-          title: new Text(
-            "EULA",
-            style: TextStyle(
-              color: Colors.white,
-            ),
-          ),
-          content: new Container(
-            height: screenHeight / 2,
-            child: Column(
-              children: <Widget>[
-                Expanded(
-                  flex: 1,
-                  child: new SingleChildScrollView(
-                    child: RichText(
-                        softWrap: true,
-                        textAlign: TextAlign.justify,
-                        text: TextSpan(
-                            style: TextStyle(
-                              color: Colors.white,
-                              //fontWeight: FontWeight.w500,
-                              fontSize: 12.0,
-                            ),
-                            text:
-                                "This End-User License Agreement is a legal agreement between you and Slumberjer This EULA agreement governs your acquisition and use of our MY.AYAM software (Software) directly from Slumberjer or indirectly through a Slumberjer authorized reseller or distributor (a Reseller).Please read this EULA agreement carefully before completing the installation process and using the MY.AYAM software. It provides a license to use the MY.AYAM software and contains warranty information and liability disclaimers. If you register for a free trial of the MY.AYAM software, this EULA agreement will also govern that trial. By clicking accept or installing and/or using the MY.AYAM software, you are confirming your acceptance of the Software and agreeing to become bound by the terms of this EULA agreement. If you are entering into this EULA agreement on behalf of a company or other legal entity, you represent that you have the authority to bind such entity and its affiliates to these terms and conditions. If you do not have such authority or if you do not agree with the terms and conditions of this EULA agreement, do not install or use the Software, and you must not accept this EULA agreement.This EULA agreement shall apply only to the Software supplied by Slumberjer herewith regardless of whether other software is referred to or described herein. The terms also apply to any Slumberjer updates, supplements, Internet-based services, and support services for the Software, unless other terms accompany those items on delivery. If so, those terms apply. This EULA was created by EULA Template for MY.AYAM. Slumberjer shall at all times retain ownership of the Software as originally downloaded by you and all subsequent downloads of the Software by you. The Software (and the copyright, and other intellectual property rights of whatever nature in the Software, including any modifications made thereto) are and shall remain the property of Slumberjer. Slumberjer reserves the right to grant licences to use the Software to third parties"
-                            //children: getSpan(),
-                            )),
-                  ),
-                )
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            // usually buttons at the bottom of the dialog
-            new FlatButton(
-              child: new Text("Close"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            )
-          ],
-        );
-      },
-    );
-  }
+  // void _showEULA() {
+  //   // flutter defined function
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       // return object of type Dialog
+  //       return AlertDialog(
+  //         title: new Text(
+  //           "EULA",
+  //           style: TextStyle(
+  //             color: Colors.white,
+  //           ),
+  //         ),
+  //         content: new Container(
+  //           height: screenHeight / 2,
+  //           child: Column(
+  //             children: <Widget>[
+  //               Expanded(
+  //                 flex: 1,
+  //                 child: new SingleChildScrollView(
+  //                   child: RichText(
+  //                       softWrap: true,
+  //                       textAlign: TextAlign.justify,
+  //                       text: TextSpan(
+  //                           style: TextStyle(
+  //                             color: Colors.white,
+  //                             //fontWeight: FontWeight.w500,
+  //                             fontSize: 12.0,
+  //                           ),
+  //                           text:
+  //                               "This End-User License Agreement is a legal agreement between you and Slumberjer This EULA agreement governs your acquisition and use of our MY.AYAM software (Software) directly from Slumberjer or indirectly through a Slumberjer authorized reseller or distributor (a Reseller).Please read this EULA agreement carefully before completing the installation process and using the MY.AYAM software. It provides a license to use the MY.AYAM software and contains warranty information and liability disclaimers. If you register for a free trial of the MY.AYAM software, this EULA agreement will also govern that trial. By clicking accept or installing and/or using the MY.AYAM software, you are confirming your acceptance of the Software and agreeing to become bound by the terms of this EULA agreement. If you are entering into this EULA agreement on behalf of a company or other legal entity, you represent that you have the authority to bind such entity and its affiliates to these terms and conditions. If you do not have such authority or if you do not agree with the terms and conditions of this EULA agreement, do not install or use the Software, and you must not accept this EULA agreement.This EULA agreement shall apply only to the Software supplied by Slumberjer herewith regardless of whether other software is referred to or described herein. The terms also apply to any Slumberjer updates, supplements, Internet-based services, and support services for the Software, unless other terms accompany those items on delivery. If so, those terms apply. This EULA was created by EULA Template for MY.AYAM. Slumberjer shall at all times retain ownership of the Software as originally downloaded by you and all subsequent downloads of the Software by you. The Software (and the copyright, and other intellectual property rights of whatever nature in the Software, including any modifications made thereto) are and shall remain the property of Slumberjer. Slumberjer reserves the right to grant licences to use the Software to third parties"
+  //                           //children: getSpan(),
+  //                           )),
+  //                 ),
+  //               )
+  //             ],
+  //           ),
+  //         ),
+  //         actions: <Widget>[
+  //           // usually buttons at the bottom of the dialog
+  //           new FlatButton(
+  //             child: new Text("Close"),
+  //             onPressed: () {
+  //               Navigator.of(context).pop();
+  //             },
+  //           )
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
 }
