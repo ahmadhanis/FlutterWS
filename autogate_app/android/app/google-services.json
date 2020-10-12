@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "595520819408",
+    "firebase_url": "https://door-access-bf339.firebaseio.com",
+    "project_id": "door-access-bf339",
+    "storage_bucket": "door-access-bf339.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:595520819408:android:22ee0bb9c54cd219244ed5",
+        "android_client_info": {
+          "package_name": "com.example.autogate_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "595520819408-dv15sphauf5kj7o35v3ljc3dfmdl5vvm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCbkppeDrvNv8-nxdMSVEuDd4sEtj4ENDE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "595520819408-dv15sphauf5kj7o35v3ljc3dfmdl5vvm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
