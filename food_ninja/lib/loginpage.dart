@@ -29,74 +29,75 @@ class _LoginPageState extends State<LoginPage> {
     return WillPopScope(
         onWillPop: _onBackPressAppBar,
         child: Scaffold(
-          appBar: AppBar(
-          title: Text('Login'),
-        ),
-          resizeToAvoidBottomPadding: false,
-          body: new Container(
-            padding: EdgeInsets.all(30.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Image.asset(
-                  'assets/images/foodninjared.png',
-                  width: 190,
-                  height: 190,
-                ),
-                TextField(
-                    controller: _emcontroller,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                        labelText: 'Email', icon: Icon(Icons.email))),
-                TextField(
-                  controller: _pscontroller,
-                  decoration: InputDecoration(
-                      labelText: 'Password', icon: Icon(Icons.lock)),
-                  obscureText: true,
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                MaterialButton(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.0)),
-                  minWidth: 300,
-                  height: 50,
-                  child: Text('Login'),
-                  color: Colors.black,
-                  textColor: Colors.white,
-                  elevation: 15,
-                  onPressed: _onPress,
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Row(
+            appBar: AppBar(
+              title: Text('Login'),
+            ),
+            //resizeToAvoidBottomPadding: false,
+            body: new Container(
+              padding: EdgeInsets.all(30.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Checkbox(
-                      value: _isChecked,
-                      onChanged: (bool value) {
-                        _onChange(value);
-                      },
+                    Image.asset(
+                      'assets/images/foodninjared.png',
+                      width: 190,
+                      height: 190,
                     ),
-                    Text('Remember Me', style: TextStyle(fontSize: 16))
+                    TextField(
+                        controller: _emcontroller,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: InputDecoration(
+                            labelText: 'Email', icon: Icon(Icons.email))),
+                    TextField(
+                      controller: _pscontroller,
+                      decoration: InputDecoration(
+                          labelText: 'Password', icon: Icon(Icons.lock)),
+                      obscureText: true,
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    MaterialButton(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0)),
+                      minWidth: 300,
+                      height: 50,
+                      child: Text('Login'),
+                      color: Colors.black,
+                      textColor: Colors.white,
+                      elevation: 15,
+                      onPressed: _onPress,
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Checkbox(
+                          value: _isChecked,
+                          onChanged: (bool value) {
+                            _onChange(value);
+                          },
+                        ),
+                        Text('Remember Me', style: TextStyle(fontSize: 16))
+                      ],
+                    ),
+                    GestureDetector(
+                        onTap: _onRegister,
+                        child: Text('Register New Account',
+                            style: TextStyle(fontSize: 16))),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    GestureDetector(
+                        onTap: _onForgot,
+                        child: Text('Forgot Account',
+                            style: TextStyle(fontSize: 16))),
                   ],
                 ),
-                GestureDetector(
-                    onTap: _onRegister,
-                    child: Text('Register New Account',
-                        style: TextStyle(fontSize: 16))),
-                SizedBox(
-                  height: 10,
-                ),
-                GestureDetector(
-                    onTap: _onForgot,
-                    child:
-                        Text('Forgot Account', style: TextStyle(fontSize: 16))),
-              ],
-            ),
-          ),
-        ));
+              ),
+            )));
   }
 
   void _onPress() {
@@ -131,9 +132,7 @@ class _LoginPageState extends State<LoginPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _email = (prefs.getString('email'));
     _pass = (prefs.getString('pass'));
-    print(_email);
-    print(_pass);
-    if (_email.length > 1) {
+    if (_email != null && _pass != null) {
       _emcontroller.text = _email;
       _pscontroller.text = _pass;
       setState(() {

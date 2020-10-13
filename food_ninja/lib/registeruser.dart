@@ -36,7 +36,7 @@ class _RegisterUserState extends State<RegisterUser> {
     return WillPopScope(
       onWillPop: _onBackPressAppBar,
       child: Scaffold(
-        resizeToAvoidBottomPadding: false,
+        //resizeToAvoidBottomPadding: false,
         appBar: AppBar(
           title: Text('New User Registration'),
           backgroundColor: Colors.black,
@@ -156,9 +156,9 @@ class _RegisterWidgetState extends State<RegisterWidget> {
         MaterialPageRoute(builder: (BuildContext context) => LoginPage()));
   }
 
-  void uploadData() {
+  Future<void> uploadData() async {
     ProgressDialog pr = new ProgressDialog(context,type: ProgressDialogType.Normal, isDismissible: false);
-    pr.show();
+    await pr.show();
 
     _name = _namecontroller.text;
     _email = _emcontroller.text;
@@ -195,7 +195,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
     }).catchError((err) {
       print(err);
     });
-    pr.dismiss();
+   await pr.hide();
   }
 
   bool _isEmailValid(String email) {

@@ -59,11 +59,11 @@ class _MainScreenState extends State<MainScreen> {
             children: <Widget>[
               Container(
                   child: Text(
-                "Click to show details",
+                "Long click to delete",
                 style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
-                    fontSize: 12),
+                    fontSize: 14),
               )),
               listGate == null
                   ? Flexible(
@@ -129,7 +129,7 @@ class _MainScreenState extends State<MainScreen> {
                                                 height: 20,
                                                 width: 20,
                                                 child: Icon(
-                                                  MdiIcons.power,
+                                                  MdiIcons.remote,
                                                   color: Color.fromRGBO(
                                                       101, 255, 218, 50),
                                                 )),
@@ -190,13 +190,13 @@ class _MainScreenState extends State<MainScreen> {
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(20.0))),
             title: new Text(
-              'Keluar aplikasi ini?',
+              'Quit this app?',
               style: TextStyle(
                 color: Colors.white,
               ),
             ),
             content: new Text(
-              'Anda Pasti?',
+              'Are you sure?',
               style: TextStyle(
                 color: Colors.white,
               ),
@@ -207,7 +207,7 @@ class _MainScreenState extends State<MainScreen> {
                     SystemChannels.platform.invokeMethod('SystemNavigator.pop');
                   },
                   child: Text(
-                    "Keluar",
+                    "Yes",
                     style: TextStyle(
                       color: Color.fromRGBO(101, 255, 218, 50),
                     ),
@@ -217,7 +217,7 @@ class _MainScreenState extends State<MainScreen> {
                     Navigator.of(context).pop(false);
                   },
                   child: Text(
-                    "Batal",
+                    "No",
                     style: TextStyle(
                       color: Color.fromRGBO(101, 255, 218, 50),
                     ),
@@ -331,7 +331,7 @@ class _MainScreenState extends State<MainScreen> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(20.0))),
               content: new Container(
-                  height: screenHeight / 1.75,
+                  height: screenHeight / 1.52,
                   child: SingleChildScrollView(
                     child: Column(children: <Widget>[
                       Text("Create New AutoGate",
@@ -349,44 +349,27 @@ class _MainScreenState extends State<MainScreen> {
                             image: AssetImage('assets/images/login.png'),
                           )),
                       SizedBox(height: 10),
-                      Row(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            child: Text(
-                              "Gate ID ",
-                              style: TextStyle(color: Colors.white),
-
-                              //children: getSpan(),
+                      TextFormField(
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                          controller: _gateidEditingController,
+                          keyboardType: TextInputType.text,
+                          decoration: InputDecoration(
+                            labelText: 'Gate ID',
+                            icon: Icon(MdiIcons.idCard),
+                          )),
+                       TextFormField(
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                          controller: _descEditingController,
+                          keyboardType: TextInputType.text,
+                          decoration: InputDecoration(
+                            labelText: 'Gate Name',
+                            icon: Icon(MdiIcons.formatTitle
                             ),
-                          ),
-                          Expanded(
-                            flex: 2,
-                            child: TextField(
-                                controller: _gateidEditingController,
-                                style: TextStyle(color: Colors.white)),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            child: Text("Description ",
-                                style: TextStyle(color: Colors.white)
-
-                                //children: getSpan(),
-                                ),
-                          ),
-                          Expanded(
-                            flex: 2,
-                            child: TextField(
-                                controller: _descEditingController,
-                                style: TextStyle(color: Colors.white)),
-                          ),
-                        ],
-                      ),
+                          )),
                       SizedBox(height: 20),
                       Container(
                           width: screenWidth / 1.5,

@@ -70,12 +70,12 @@ class _ProgressIndicatorState extends State<ProgressIndicator>
   Widget build(BuildContext context) {
     return new Center(
         child: new Container(
-      width: 200,
-      color: Colors.redAccent,
-      child: LinearProgressIndicator(
+      //width: 200,
+      //color: Colors.redAccent,
+      child: CircularProgressIndicator(
         value: animation.value,
-        backgroundColor: Colors.black,
-        valueColor: new AlwaysStoppedAnimation<Color>(Colors.red),
+        //backgroundColor: Colors.black,
+        valueColor: new AlwaysStoppedAnimation<Color>(Colors.black),
       ),
     ));
   }
