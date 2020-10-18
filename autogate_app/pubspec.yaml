@@ -49,6 +49,7 @@ dev_dependencies:
   image_cropper: ^1.2.2
   basic_utils: ^2.6.2
   date_util: ^0.1.4
+  intl: ^0.16.1
   
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -1,5 +1,4 @@
-import 'dart:math';
-
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:progress_dialog/progress_dialog.dart';
@@ -26,6 +25,8 @@ class _MainScreenState extends State<MainScreen> {
   String titlecenter = "Loading";
   TextEditingController _gateidEditingController = new TextEditingController();
   TextEditingController _descEditingController = new TextEditingController();
+  final dateformat = new DateFormat('dd-MM-yyyy hh:mm a');
+  final dateformatseconds = new DateFormat('dd-MM-yyyy hh:mm:s');
   @override
   void initState() {
     super.initState();
@@ -135,6 +136,16 @@ class _MainScreenState extends State<MainScreen> {
                                                 )),
                                           ),
                                         )),
+                                        Flexible(child: Text(
+                                                        listGate[index]
+                                                            .gtime
+                                                            .toString()
+                                                            .toUpperCase(),
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color:
+                                                                Colors.white)),)
                                       ],
                                     )),
                               ),
@@ -163,10 +174,13 @@ class _MainScreenState extends State<MainScreen> {
         setState(() {
           listGate.clear();
         });
+        print("LOADGATE");
+        print(map);
         for (int i = 0; i < map.length; i++) {
           String gateid = map.keys.elementAt(i);
           String desc = map.values.toList()[i]["desc"];
-          AutoGate newgate = AutoGate(gateid, desc);
+          String gtime = map.values.toList()[i]["status"];
+          AutoGate newgate = AutoGate(gateid, desc,gtime);
           setState(() {
             listGate.add(newgate);
           });
@@ -285,23 +299,44 @@ class _MainScreenState extends State<MainScreen> {
         firebaseref
             .child("devices")
             .child(listGate[index].gateid)
-            .update({'status': generateRandomString(6)});
+            .update({'status': generateDateString()});
+            
+       
+      } else {
+        Toast.show("Failed", context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.TOP);
+            return;
+      }
+    });
+    firebaseref.child("users").once().then((DataSnapshot snapshot) {
+      if (snapshot.value != null) {
+        firebaseref
+        .child("users")
+            .child(widget.user.email)
+            .child("autogate")
+            .child(listGate[index].gateid)
+            .update({'status': generateDateString()});
         Toast.show("Success", context,
             duration: Toast.LENGTH_LONG, gravity: Toast.TOP);
+            getData();
       } else {
         Toast.show("Failed", context,
             duration: Toast.LENGTH_LONG, gravity: Toast.TOP);
       }
     });
+    
     await pr.hide();
   }
 
-  String generateRandomString(int len) {
-    var r = Random();
-    const _chars =
-        'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
-    return List.generate(len, (index) => _chars[r.nextInt(_chars.length)])
-        .join();
+  String generateDateString() {
+    
+    DateTime now = new DateTime.now();
+    //var r = Random();
+    return dateformatseconds.format(now).toString();
+    // const _chars =
+    //     'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+    // return List.generate(len, (index) => _chars[r.nextInt(_chars.length)])
+    //     .join();
   }
 
   _deleteGate(int index) async {
@@ -359,7 +394,7 @@ class _MainScreenState extends State<MainScreen> {
                             labelText: 'Gate ID',
                             icon: Icon(MdiIcons.idCard),
                           )),
-                       TextFormField(
+                      TextFormField(
                           style: TextStyle(
                             color: Colors.white,
                           ),
@@ -367,8 +402,7 @@ class _MainScreenState extends State<MainScreen> {
                           keyboardType: TextInputType.text,
                           decoration: InputDecoration(
                             labelText: 'Gate Name',
-                            icon: Icon(MdiIcons.formatTitle
-                            ),
+                            icon: Icon(MdiIcons.formatTitle),
                           )),
                       SizedBox(height: 20),
                       Container(
