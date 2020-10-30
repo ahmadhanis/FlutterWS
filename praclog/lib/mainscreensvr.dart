@@ -122,7 +122,7 @@ class _MainScreenSvrState extends State<MainScreenSvr> {
     screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Practicum Logs',
+        title: Text('Log Book',
             style: TextStyle(
               color: Colors.white,
             )),
@@ -272,7 +272,7 @@ class _MainScreenSvrState extends State<MainScreenSvr> {
               : Flexible(
                   child: GridView.count(
                   crossAxisCount: 2,
-                  childAspectRatio: (screenWidth / screenHeight) / 0.55,
+                  childAspectRatio: (screenWidth / screenHeight) / 0.5,
                   children: List.generate(recordlist.length, (index) {
                     return Padding(
                         padding: EdgeInsets.all(2),
@@ -301,6 +301,7 @@ class _MainScreenSvrState extends State<MainScreenSvr> {
                                       width: 10,
                                     ),
                                     Expanded(
+                                      child:SingleChildScrollView(
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -340,7 +341,7 @@ class _MainScreenSvrState extends State<MainScreenSvr> {
                                               )),
                                         ],
                                       ),
-                                    ),
+                                    )),
                                   ],
                                 )),
                           ),
@@ -399,7 +400,7 @@ class _MainScreenSvrState extends State<MainScreenSvr> {
                 mainAxisSize: pw.MainAxisSize.min,
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: <pw.Widget>[
-                  pw.Text("Practicum Log Book",
+                  pw.Text("Log Book",
                       style: pw.TextStyle(
                           fontWeight: pw.FontWeight.bold, fontSize: 24)),
                   pw.Text("Name            :" + widget.user.name),

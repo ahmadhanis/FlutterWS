@@ -19,6 +19,9 @@ import 'package:open_file/open_file.dart';
 import 'package:basic_utils/basic_utils.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
 
 class ParticipantScreen extends StatefulWidget {
   final User user;
@@ -34,6 +37,9 @@ class _ParticipantScreenState extends State<ParticipantScreen> {
   List recordlist;
   String curaddress, selectedMonth, selectedYear;
   double screenHeight, screenWidth;
+  Position _currentPosition;
+  double latitude, longitude;
+  String selectedLocation;
   String curmonth, curyear, titlecenter = "Log peserta";
   // TextEditingController _oldPassEditingController = new TextEditingController();
   // TextEditingController _newpassEditingController = new TextEditingController();
@@ -41,13 +47,13 @@ class _ParticipantScreenState extends State<ParticipantScreen> {
   final f = new DateFormat('dd/MM/yyyy');
   final fb = new DateFormat('hh:mm a');
   final fc = new DateFormat('dd/MM/yyyy hh:mm a');
-
+  String urlUpdateLoc = "https://slumberjer.com/ayam/php/update_loc.php";
   var dateUtility;
   var numdaymonth;
-
+  File _image;
   List<String> monthlist = [
     "Januari",
-    "Febuari",
+    "Februari",
     "Mac",
     "April",
     "Mei",
@@ -57,7 +63,7 @@ class _ParticipantScreenState extends State<ParticipantScreen> {
     "September",
     "Oktober",
     "November",
-    "Desember"
+    "Disember"
   ];
   List<String> yearlist = [
     "2020",
@@ -116,6 +122,12 @@ class _ParticipantScreenState extends State<ParticipantScreen> {
     print(curyear);
     WidgetsBinding.instance
         .addPostFrameCallback((_) => _loadRecord(curmonth, curyear));
+    _getLocation();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -147,6 +159,16 @@ class _ParticipantScreenState extends State<ParticipantScreen> {
               label: "Segarkan Logs",
               labelBackgroundColor: Colors.white,
               onTap: () => _loadRecord(curmonth, curyear)),
+          SpeedDialChild(
+              child: Icon(Icons.location_on_rounded),
+              label: "Tetapsemula lokasi sangkar",
+              labelBackgroundColor: Colors.white,
+              onTap: () => updateLoc()),
+          SpeedDialChild(
+              child: Icon(Icons.camera_front),
+              label: "Kemaskini gambar peserta",
+              labelBackgroundColor: Colors.white,
+              onTap: () => _onPictureSelection()),
         ],
       ),
       body: Column(
@@ -194,9 +216,11 @@ class _ParticipantScreenState extends State<ParticipantScreen> {
               child: Container(
                 //color: Colors.red,
                 height: screenHeight / 14,
+
+                width: screenWidth / 0.8,
                 margin: EdgeInsets.fromLTRB(5, 2, 2, 0),
                 child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
+                  //scrollDirection: Axis.horizontal,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
@@ -295,7 +319,7 @@ class _ParticipantScreenState extends State<ParticipantScreen> {
               : Flexible(
                   child: GridView.count(
                   crossAxisCount: 2,
-                  childAspectRatio: (screenWidth / screenHeight) / 0.55,
+                  childAspectRatio: (screenWidth / screenHeight) / 0.4,
                   children: List.generate(recordlist.length, (index) {
                     return Padding(
                         padding: EdgeInsets.all(2),
@@ -324,6 +348,7 @@ class _ParticipantScreenState extends State<ParticipantScreen> {
                                       width: 10,
                                     ),
                                     Expanded(
+                                        child: SingleChildScrollView(
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -363,7 +388,7 @@ class _ParticipantScreenState extends State<ParticipantScreen> {
                                               )),
                                         ],
                                       ),
-                                    ),
+                                    )),
                                   ],
                                 )),
                           ),
@@ -373,6 +398,53 @@ class _ParticipantScreenState extends State<ParticipantScreen> {
         ],
       ),
     );
+  }
+
+  _getLocation() async {
+    final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
+    _currentPosition = await geolocator
+        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
+        .timeout(Duration(seconds: 15), onTimeout: () {
+      return;
+    });
+
+    setState(() {
+      latitude = _currentPosition.latitude;
+      longitude = _currentPosition.longitude;
+    });
+  }
+
+  Future<void> updateLoc() async {
+    String icno = widget.user.icno;
+    if (latitude == null || longitude == null) {
+      Toast.show("Lokasi sekarang belum dijumpai", context,
+          duration: Toast.LENGTH_LONG, gravity: Toast.TOP);
+      return;
+    }
+    ProgressDialog pr = new ProgressDialog(context,
+        type: ProgressDialogType.Normal, isDismissible: false);
+    pr.style(message: "Kemaskini Lokasi Sekarang");
+    await pr.show();
+
+    http.post(urlUpdateLoc, body: {
+      "icno": icno,
+      "latitude": latitude.toString(),
+      "longitude": longitude.toString(),
+    }).then((res) {
+      print(res.body);
+      if (res.body == "success") {
+        Toast.show("Kemaskini lokasi berjaya", context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.TOP);
+        widget.user.latitude = latitude.toString();
+        widget.user.latitude = longitude.toString();
+      } else {
+        Toast.show("Kemaskini lokasi gagal", context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.TOP);
+      }
+    }).catchError((err) {
+      print(err);
+    });
+    await pr.hide();
   }
 
   _openGooglemap() async {
@@ -488,21 +560,26 @@ class _ParticipantScreenState extends State<ParticipantScreen> {
     const tableHeaders = [
       'Item',
       'Penerangan',
-      'Tarikh',
-      'Mati',
       'Hidup',
-      'Pelawat'
+      'Mati',
+      'Hilang',
+      'Sakit',
+      'Pemantau',
+      'Tarikh'
     ];
     final loglist = <LogRecord>[];
 
     for (int i = 0; i < recordlist.length; i++) {
       loglist.add(new LogRecord(
-          (i + 1).toString(),
-          recordlist[i]['description'],
-          (fc.format(DateTime.parse(recordlist[i]['date'])).toString()),
-          recordlist[i]['dead'],
-          recordlist[i]['alive'],
-          recordlist[i]['supervisor']));
+        (i + 1).toString(),
+        recordlist[i]['description'],
+        recordlist[i]['alive'],
+        recordlist[i]['dead'],
+        recordlist[i]['lost'],
+        recordlist[i]['sick'],
+        recordlist[i]['supervisor'],
+        (fc.format(DateTime.parse(recordlist[i]['date'])).toString()),
+      ));
     }
     print("TEST:" + loglist[0].description);
 
@@ -511,12 +588,14 @@ class _ParticipantScreenState extends State<ParticipantScreen> {
     DateTime now = new DateTime.now();
     Map<int, pw.TableColumnWidth> widths = Map();
     widths = {
-      0: pw.FractionColumnWidth(0.08),
-      1: pw.FractionColumnWidth(0.5),
-      2: pw.FractionColumnWidth(0.15),
-      3: pw.FractionColumnWidth(0.1),
-      4: pw.FractionColumnWidth(0.1),
-      5: pw.FractionColumnWidth(0.15)
+      0: pw.FractionColumnWidth(0.05),
+      1: pw.FractionColumnWidth(0.25),
+      2: pw.FractionColumnWidth(0.08),
+      3: pw.FractionColumnWidth(0.08),
+      4: pw.FractionColumnWidth(0.08),
+      5: pw.FractionColumnWidth(0.08),
+      6: pw.FractionColumnWidth(0.1),
+      7: pw.FractionColumnWidth(0.1)
     };
     doc.addPage(pw.MultiPage(build: (pw.Context context) {
       return <pw.Widget>[
@@ -550,6 +629,8 @@ class _ParticipantScreenState extends State<ParticipantScreen> {
             3: pw.Alignment.centerLeft,
             4: pw.Alignment.centerLeft,
             5: pw.Alignment.centerLeft,
+            6: pw.Alignment.centerLeft,
+            7: pw.Alignment.centerLeft,
           },
           headerStyle: pw.TextStyle(
             fontSize: 10,
@@ -622,19 +703,46 @@ class _ParticipantScreenState extends State<ParticipantScreen> {
   }
 
   void _deleteDetail(int index) {
+    TextEditingController _passEditingController = new TextEditingController();
+
     showDialog(
         context: context,
         builder: (BuildContext context) {
           // return object of type Dialog
           return AlertDialog(
             title: new Text(
-              "Buang rekod? " +
+              "Buang rekod " +
                   f.format(
                     DateTime.parse(recordlist[index]['date']),
                   ) +
                   "?",
               style: TextStyle(
                 color: Colors.white,
+              ),
+            ),
+            content: Container(
+              height: screenHeight / 10,
+              child: Column(
+                children: [
+                  Flexible(
+                    child: TextFormField(
+                      obscureText: true,
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                      controller: _passEditingController,
+                      keyboardType: TextInputType.number,
+                      textInputAction: TextInputAction.next,
+                      decoration: InputDecoration(
+                        //labelText: 'Kata Laluan',
+
+                        hintText: 'Kata laluan',
+                        icon: Icon(MdiIcons.lock),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 15),
+                ],
               ),
             ),
             actions: <Widget>[
@@ -650,20 +758,23 @@ class _ParticipantScreenState extends State<ParticipantScreen> {
                   http.post("https://slumberjer.com/ayam/php/delete_log.php",
                       body: {
                         "rid": recordlist[index]["recid"],
+                        "pass": _passEditingController.text
                       }).then((res) {
                     print(res.body);
                     if (res.body == "success") {
                       Toast.show("Berjaya", context,
                           duration: Toast.LENGTH_LONG, gravity: Toast.TOP);
+                          Navigator.of(context).pop();
                     } else {
                       Toast.show("Gagal", context,
                           duration: Toast.LENGTH_LONG, gravity: Toast.TOP);
+                          Navigator.of(context).pop();
                     }
                     _loadRecord(curmonth, curyear);
                   }).catchError((err) {
                     print(err);
                   });
-                  Navigator.of(context).pop();
+                  
                 },
               ),
               new FlatButton(
@@ -775,7 +886,7 @@ class _ParticipantScreenState extends State<ParticipantScreen> {
                       Row(
                         children: [
                           Expanded(
-                            child: Text("Pelawat ",
+                            child: Text("Pemantau ",
                                 softWrap: true,
                                 textAlign: TextAlign.justify,
                                 style: TextStyle(color: Colors.white)
@@ -862,6 +973,50 @@ class _ParticipantScreenState extends State<ParticipantScreen> {
                           )
                         ],
                       ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text("Bil. Hilang ",
+                                softWrap: true,
+                                textAlign: TextAlign.justify,
+                                style: TextStyle(color: Colors.white)
+
+                                //children: getSpan(),
+                                ),
+                          ),
+                          Expanded(
+                            child: Text(recordlist[index]['lost'],
+                                softWrap: true,
+                                textAlign: TextAlign.justify,
+                                style: TextStyle(color: Colors.white)
+
+                                //children: getSpan(),
+                                ),
+                          )
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text("Bil. Sakit ",
+                                softWrap: true,
+                                textAlign: TextAlign.justify,
+                                style: TextStyle(color: Colors.white)
+
+                                //children: getSpan(),
+                                ),
+                          ),
+                          Expanded(
+                            child: Text(recordlist[index]['sick'],
+                                softWrap: true,
+                                textAlign: TextAlign.justify,
+                                style: TextStyle(color: Colors.white)
+
+                                //children: getSpan(),
+                                ),
+                          )
+                        ],
+                      ),
                       Container(
                           alignment: Alignment.center,
                           child: Text("Penerangan",
@@ -895,162 +1050,155 @@ class _ParticipantScreenState extends State<ParticipantScreen> {
     );
   }
 
-  // _changePasswordDialog() {
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //           //backgroundColor: Colors.white,
-  //           shape: RoundedRectangleBorder(
-  //               borderRadius: BorderRadius.all(Radius.circular(20.0))),
-  //           content: new Container(
-  //               //color: Colors.white,
-  //               height: screenHeight / 2.8,
-  //               child: SingleChildScrollView(
-  //                 child: Column(
-  //                   mainAxisSize: MainAxisSize.min,
-  //                   crossAxisAlignment: CrossAxisAlignment.center,
-  //                   mainAxisAlignment: MainAxisAlignment.start,
-  //                   children: <Widget>[
-  //                     Container(
-  //                         alignment: Alignment.center,
-  //                         child: Text("Change your password",
-  //                             style: TextStyle(
-  //                                 fontWeight: FontWeight.bold,
-  //                                 fontSize: 16,
-  //                                 color: Colors.white))),
-  //                     TextField(
-  //                       style: TextStyle(
-  //                         color: Colors.white,
-  //                       ),
-  //                       controller: _oldPassEditingController,
-  //                       decoration: InputDecoration(
-  //                         labelText: 'Old Password',
-  //                         icon: Icon(Icons.lock),
-  //                       ),
-  //                       obscureText: true,
-  //                     ),
-  //                     TextField(
-  //                       style: TextStyle(
-  //                         color: Colors.white,
-  //                       ),
-  //                       controller: _newpassEditingController,
-  //                       decoration: InputDecoration(
-  //                         labelText: 'New Password',
-  //                         icon: Icon(Icons.lock),
-  //                       ),
-  //                       obscureText: true,
-  //                     ),
-  //                     SizedBox(
-  //                       height: 10,
-  //                     ),
-  //                     MaterialButton(
-  //                       shape: RoundedRectangleBorder(
-  //                           borderRadius: BorderRadius.circular(5.0)),
-  //                       minWidth: 200,
-  //                       height: 50,
-  //                       child: Text('Change',
-  //                           style: TextStyle(
-  //                             color: Colors.black,
-  //                           )),
-  //                       color: Color.fromRGBO(101, 255, 218, 50),
-  //                       textColor: Colors.white,
-  //                       elevation: 10,
-  //                       onPressed: () => _changePasswordDialogConfirm(
-  //                           _oldPassEditingController.text,
-  //                           _newpassEditingController.text),
-  //                     ),
-  //                   ],
-  //                 ),
-  //               )));
-  //     },
-  //   );
-  // }
+  _onPictureSelection() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+            //backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(20.0))),
+            content: new Container(
+              //color: Colors.white,
+              height: screenHeight / 4,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                      alignment: Alignment.center,
+                      child: Text(
+                        "Ambil gambar dari:",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16),
+                      )),
+                  SizedBox(height: 5),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                          child: MaterialButton(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5.0)),
+                        minWidth: 100,
+                        height: 100,
+                        child: Text('Kamera',
+                            style: TextStyle(
+                              color: Colors.black,
+                            )),
+                        color: Color.fromRGBO(101, 255, 218, 50),
+                        textColor: Colors.white,
+                        elevation: 10,
+                        onPressed: () =>
+                            {Navigator.pop(context), _chooseCamera()},
+                      )),
+                      SizedBox(width: 10),
+                      Flexible(
+                          child: MaterialButton(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5.0)),
+                        minWidth: 100,
+                        height: 100,
+                        child: Text('Galeri',
+                            style: TextStyle(
+                              color: Colors.black,
+                            )),
+                        color: Color.fromRGBO(101, 255, 218, 50),
+                        textColor: Colors.white,
+                        elevation: 10,
+                        onPressed: () => {
+                          Navigator.pop(context),
+                          _chooseGallery(),
+                        },
+                      )),
+                    ],
+                  ),
+                ],
+              ),
+            ));
+      },
+    );
+  }
 
-  // void _changePasswordDialogConfirm(String oldp, String newp) {
-  //   if (oldp == "" && newp == "") {
-  //     Toast.show("Please enter old and new password", context,
-  //         duration: Toast.LENGTH_LONG, gravity: Toast.TOP);
-  //     return;
-  //   }
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       // return object of type Dialog
-  //       return AlertDialog(
-  //         shape: RoundedRectangleBorder(
-  //             borderRadius: BorderRadius.all(Radius.circular(20.0))),
-  //         title: new Text(
-  //           "Change your password?",
-  //           style: TextStyle(
-  //             color: Colors.white,
-  //           ),
-  //         ),
-  //         content:
-  //             new Text("Are you sure?", style: TextStyle(color: Colors.white)),
-  //         actions: <Widget>[
-  //           // usually buttons at the bottom of the dialog
-  //           new FlatButton(
-  //             child: new Text(
-  //               "Yes",
-  //               style: TextStyle(
-  //                 color: Color.fromRGBO(101, 255, 218, 50),
-  //               ),
-  //             ),
-  //             onPressed: () => {
-  //               Navigator.of(context).pop(),
-  //               finalChangePassword(oldp, newp)
-  //             },
-  //           ),
-  //           new FlatButton(
-  //             child: new Text(
-  //               "No",
-  //               style: TextStyle(
-  //                 color: Color.fromRGBO(101, 255, 218, 50),
-  //               ),
-  //             ),
-  //             onPressed: () {
-  //               Navigator.of(context).pop();
-  //             },
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
+  void _chooseCamera() async {
+    // ignore: deprecated_member_use
+    _image = await ImagePicker.pickImage(
+        source: ImageSource.camera, maxHeight: 800, maxWidth: 800);
+    _cropImage();
+    setState(() {});
+  }
 
-  // Future<void> finalChangePassword(String oldp, String newp) async {
-  //   ProgressDialog pr = new ProgressDialog(context,
-  //       type: ProgressDialogType.Normal, isDismissible: true);
-  //   pr.style(message: "Updating password...");
-  //   await pr.show();
-  //   String urlreset = "https://slumberjer.com/ayam/php/reset.php";
-  //   http
-  //       .post(urlreset, body: {
-  //         "icno": widget.user.icno,
-  //         "oldpass": oldp,
-  //         "newpass": newp,
-  //         "user": "STUDENT"
-  //       })
-  //       .timeout(const Duration(seconds: 10))
-  //       .then((res) {
-  //         print("Respond:" + res.body);
-  //         setState(() {
-  //           if (res.body == "success") {
-  //             Toast.show("Success", context,
-  //                 duration: Toast.LENGTH_LONG, gravity: Toast.TOP);
-  //             Navigator.of(context).pop();
-  //           } else {
-  //             Toast.show("Failed", context,
-  //                 duration: Toast.LENGTH_LONG, gravity: Toast.TOP);
-  //           }
-  //         });
-  //       })
-  //       .catchError((err) {
-  //         print(err);
-  //         Toast.show("Error:" + err.toString(), context,
-  //             duration: Toast.LENGTH_LONG, gravity: Toast.TOP);
-  //       });
-  //   await pr.hide();
-  // }
+  void _chooseGallery() async {
+    // ignore: deprecated_member_use
+    _image = await ImagePicker.pickImage(
+        source: ImageSource.gallery, maxHeight: 800, maxWidth: 800);
+    _cropImage();
+    setState(() {});
+  }
+
+  Future<Null> _cropImage() async {
+    File croppedFile = await ImageCropper.cropImage(
+        sourcePath: _image.path,
+        aspectRatioPresets: Platform.isAndroid
+            ? [
+                CropAspectRatioPreset.square,
+                //CropAspectRatioPreset.ratio3x2,
+                //CropAspectRatioPreset.original,
+                //CropAspectRatioPreset.ratio4x3,
+                //CropAspectRatioPreset.ratio16x9
+              ]
+            : [
+                //CropAspectRatioPreset.original,
+                CropAspectRatioPreset.square,
+                //CropAspectRatioPreset.ratio3x2,
+                //CropAspectRatioPreset.ratio4x3,
+                //CropAspectRatioPreset.ratio5x3,
+                //CropAspectRatioPreset.ratio5x4,
+                //CropAspectRatioPreset.ratio7x5,
+                //CropAspectRatioPreset.ratio16x9
+              ],
+        androidUiSettings: AndroidUiSettings(
+            toolbarTitle: 'Resize',
+            toolbarColor: Colors.deepOrange,
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.square,
+            lockAspectRatio: false),
+        iosUiSettings: IOSUiSettings(
+          title: 'Cropper',
+        ));
+    if (croppedFile != null) {
+      _image = croppedFile;
+      uploadImage();
+      setState(() {});
+    }
+  }
+
+  Future<void> uploadImage() async {
+    ProgressDialog pr = new ProgressDialog(context,
+        type: ProgressDialogType.Normal, isDismissible: false);
+    pr.style(message: "Memuatnaik gambar peserta");
+    await pr.show();
+    String base64Image = base64Encode(_image.readAsBytesSync());
+    http.post("http://slumberjer.com/ayam/php/upload_image.php", body: {
+      "icno": widget.user.icno,
+      "encoded_string": base64Image,
+    }).then((res) {
+      print(res.body);
+      if (res.body == "success") {
+        Toast.show("Kemaskini gambar berjaya", context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.TOP);
+        widget.user.latitude = latitude.toString();
+        widget.user.latitude = longitude.toString();
+      } else {
+        Toast.show("Kemaskini gambar gagal", context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.TOP);
+      }
+    }).catchError((err) {
+      print(err);
+    });
+    await pr.hide();
+  }
 }

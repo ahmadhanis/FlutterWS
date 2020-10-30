@@ -20,6 +20,7 @@ import 'package:flutter_open_whatsapp/flutter_open_whatsapp.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 class MainScreen extends StatefulWidget {
   final User user;
@@ -33,7 +34,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   //Position _currentPosition;
   List recordlist;
-  String curaddress, selectedMonth, selectedLocation, _scanBarcode;
+  String curaddress, selectedMonth, selectedLocation = "Semua", _scanBarcode;
   double screenHeight, screenWidth;
   String titlecenter = "";
   var dateUtility;
@@ -43,20 +44,25 @@ class _MainScreenState extends State<MainScreen> {
   final fb = new DateFormat('hh:mm a');
   final fc = new DateFormat('dd/MM/yyyy hh:mm a');
   List<String> loclist = [
+    "Semua",
     "Kerasak",
     "Changlun",
   ];
+  DefaultCacheManager manager = new DefaultCacheManager();
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance
-        .addPostFrameCallback((_) => _loadParticipant("aktif", "all"));
+        .addPostFrameCallback((_) => _loadParticipant("aktif", selectedLocation));
   }
 
   @override
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
+
+    manager.emptyCache();
     return WillPopScope(
         onWillPop: _onBackPressed,
         child: Scaffold(
@@ -460,7 +466,7 @@ class _MainScreenState extends State<MainScreen> {
     }
     ProgressDialog pr = new ProgressDialog(context,
         type: ProgressDialogType.Normal, isDismissible: true);
-    pr.style(message: "Loading...");
+    pr.style(message: "Memuaturun...");
     await pr.show();
     String urlLoadJobs = "https://slumberjer.com/ayam/php/load_participant.php";
     http
@@ -488,7 +494,7 @@ class _MainScreenState extends State<MainScreen> {
     await pr.hide();
   }
 
-  _onLogDetail(int index) {
+  _onLogDetail(int index) async {
     print(recordlist[index]['name']);
     User _user = new User(
         name: recordlist[index]['name'],
@@ -497,12 +503,18 @@ class _MainScreenState extends State<MainScreen> {
         address: recordlist[index]['homeadd'],
         location: recordlist[index]['location']);
 
-    Navigator.push(
+    await Navigator.push(
         context,
         MaterialPageRoute(
             builder: (BuildContext context) => ParticipantScreen(
                   user: _user,
                 )));
+    setState(() {
+      DefaultCacheManager manager = new DefaultCacheManager();
+      manager.emptyCache();
+      imageCache.clear();
+    });
+    _loadParticipant("aktif", "all");
   }
 
   _onLogDetailQR() {
@@ -529,129 +541,7 @@ class _MainScreenState extends State<MainScreen> {
       }
     }
   }
-  // _changePasswordDialog() {
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //           //backgroundColor: Colors.white,
-  //           shape: RoundedRectangleBorder(
-  //               borderRadius: BorderRadius.all(Radius.circular(20.0))),
-  //           content: new Container(
-  //               //color: Colors.white,
-  //               height: screenHeight / 2.8,
-  //               child: SingleChildScrollView(
-  //                 child: Column(
-  //                   mainAxisSize: MainAxisSize.min,
-  //                   crossAxisAlignment: CrossAxisAlignment.center,
-  //                   mainAxisAlignment: MainAxisAlignment.start,
-  //                   children: <Widget>[
-  //                     Container(
-  //                         alignment: Alignment.center,
-  //                         child: Text("Change your password",
-  //                             style: TextStyle(
-  //                                 fontWeight: FontWeight.bold,
-  //                                 fontSize: 16,
-  //                                 color: Colors.white))),
-  //                     TextField(
-  //                       style: TextStyle(
-  //                         color: Colors.white,
-  //                       ),
-  //                       controller: _oldPassEditingController,
-  //                       decoration: InputDecoration(
-  //                         labelText: 'Old Password',
-  //                         icon: Icon(Icons.lock),
-  //                       ),
-  //                       obscureText: true,
-  //                     ),
-  //                     TextField(
-  //                       style: TextStyle(
-  //                         color: Colors.white,
-  //                       ),
-  //                       controller: _newpassEditingController,
-  //                       decoration: InputDecoration(
-  //                         labelText: 'New Password',
-  //                         icon: Icon(Icons.lock),
-  //                       ),
-  //                       obscureText: true,
-  //                     ),
-  //                     SizedBox(
-  //                       height: 10,
-  //                     ),
-  //                     MaterialButton(
-  //                       shape: RoundedRectangleBorder(
-  //                           borderRadius: BorderRadius.circular(5.0)),
-  //                       minWidth: 200,
-  //                       height: 50,
-  //                       child: Text('Change',
-  //                           style: TextStyle(
-  //                             color: Colors.black,
-  //                           )),
-  //                       color: Color.fromRGBO(101, 255, 218, 50),
-  //                       textColor: Colors.white,
-  //                       elevation: 10,
-  //                       onPressed: () => _changePasswordDialogConfirm(
-  //                           _oldPassEditingController.text,
-  //                           _newpassEditingController.text),
-  //                     ),
-  //                   ],
-  //                 ),
-  //               )));
-  //     },
-  //   );
-  // }
-
-  // void _changePasswordDialogConfirm(String oldp, String newp) {
-  //   if (oldp == "" && newp == "") {
-  //     Toast.show("Please enter old and new password", context,
-  //         duration: Toast.LENGTH_LONG, gravity: Toast.TOP);
-  //     return;
-  //   }
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       // return object of type Dialog
-  //       return AlertDialog(
-  //         shape: RoundedRectangleBorder(
-  //             borderRadius: BorderRadius.all(Radius.circular(20.0))),
-  //         title: new Text(
-  //           "Change your password?",
-  //           style: TextStyle(
-  //             color: Colors.white,
-  //           ),
-  //         ),
-  //         content:
-  //             new Text("Are you sure?", style: TextStyle(color: Colors.white)),
-  //         actions: <Widget>[
-  //           // usually buttons at the bottom of the dialog
-  //           new FlatButton(
-  //             child: new Text(
-  //               "Ya",
-  //               style: TextStyle(
-  //                 color: Color.fromRGBO(101, 255, 218, 50),
-  //               ),
-  //             ),
-  //             onPressed: () => {
-  //               Navigator.of(context).pop(),
-  //               //finalChangePassword(oldp, newp)
-  //             },
-  //           ),
-  //           new FlatButton(
-  //             child: new Text(
-  //               "No",
-  //               style: TextStyle(
-  //                 color: Color.fromRGBO(101, 255, 218, 50),
-  //               ),
-  //             ),
-  //             onPressed: () {
-  //               Navigator.of(context).pop();
-  //             },
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
+  
 
   Future<void> _registerScreen() async {
     await Navigator.push(context,
@@ -659,42 +549,10 @@ class _MainScreenState extends State<MainScreen> {
     _loadParticipant("aktif", "all");
   }
 
-  // Future<void> finalChangePassword(String oldp, String newp) async {
-  //   ProgressDialog pr = new ProgressDialog(context,
-  //       type: ProgressDialogType.Normal, isDismissible: true);
-  //   pr.style(message: "Updating password...");
-  //   await pr.show();
-  //   String urlreset = "https://slumberjer.com/prak/php/reset.php";
-  //   http
-  //       .post(urlreset, body: {
-  //         "email": widget.user.email,
-  //         "oldpass": oldp,
-  //         "newpass": newp,
-  //         "user": "SUPERVISOR"
-  //       })
-  //       .timeout(const Duration(seconds: 10))
-  //       .then((res) {
-  //         print("Respond:" + res.body);
-  //         setState(() {
-  //           if (res.body == "success") {
-  //             Toast.show("Success", context,
-  //                 duration: Toast.LENGTH_LONG, gravity: Toast.TOP);
-  //             Navigator.of(context).pop();
-  //           } else {
-  //             Toast.show("Failed", context,
-  //                 duration: Toast.LENGTH_LONG, gravity: Toast.TOP);
-  //           }
-  //         });
-  //       })
-  //       .catchError((err) {
-  //         print(err);
-  //         Toast.show("Error:" + err.toString(), context,
-  //             duration: Toast.LENGTH_LONG, gravity: Toast.TOP);
-  //       });
-  //   await pr.hide();
-  // }
+  
 
   _onParticipantSelection(int index) {
+    TextEditingController _passEditingController = new TextEditingController();
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -704,7 +562,7 @@ class _MainScreenState extends State<MainScreen> {
                 borderRadius: BorderRadius.all(Radius.circular(20.0))),
             content: new Container(
               //color: Colors.white,
-              height: screenHeight / 4,
+              height: screenHeight / 3,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -719,7 +577,25 @@ class _MainScreenState extends State<MainScreen> {
                             fontWeight: FontWeight.bold,
                             fontSize: 16),
                       )),
-                  SizedBox(height: 5),
+                  Flexible(
+                    child: TextFormField(
+                      obscureText: true,
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                      controller: _passEditingController,
+                      keyboardType: TextInputType.number,
+                      textInputAction: TextInputAction.next,
+                      decoration: InputDecoration(
+                        //labelText: 'Kata Laluan',
+                        
+                        hintText: 'Kata laluan',
+                        icon: Icon(MdiIcons.lock),
+                      ),
+                      
+                    ),
+                  ),
+                  SizedBox(height: 15),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -737,7 +613,7 @@ class _MainScreenState extends State<MainScreen> {
                         textColor: Colors.white,
                         elevation: 10,
                         onPressed: () =>
-                            {Navigator.pop(context), _deleteParticipant(index)},
+                            {Navigator.pop(context), _deleteParticipant(index, _passEditingController.text)},
                       )),
                       SizedBox(width: 10),
                       Flexible(
@@ -746,7 +622,7 @@ class _MainScreenState extends State<MainScreen> {
                             borderRadius: BorderRadius.circular(5.0)),
                         minWidth: 100,
                         height: 100,
-                        child: Text('Kemaskini status selesai',
+                        child: Text('Status selesai',
                             style: TextStyle(
                               color: Colors.black,
                             )),
@@ -755,7 +631,7 @@ class _MainScreenState extends State<MainScreen> {
                         elevation: 10,
                         onPressed: () => {
                           Navigator.pop(context),
-                          _updateStatus(index),
+                          _updateStatus(index, _passEditingController.text),
                         },
                       )),
                     ],
@@ -767,7 +643,7 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  void _deleteParticipant(int index) {
+  void _deleteParticipant(int index, String pass) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -793,20 +669,23 @@ class _MainScreenState extends State<MainScreen> {
                       "https://slumberjer.com/ayam/php/delete_participant.php",
                       body: {
                         "icno": recordlist[index]["icno"],
+                        "pass": pass
                       }).then((res) {
                     print(res.body);
                     if (res.body == "success") {
                       Toast.show("Berjaya", context,
                           duration: Toast.LENGTH_LONG, gravity: Toast.TOP);
+                           Navigator.of(context).pop();
+                          _loadParticipant("aktif", "all");
                     } else {
                       Toast.show("Gagal", context,
                           duration: Toast.LENGTH_LONG, gravity: Toast.TOP);
+                           Navigator.of(context).pop();
                     }
-                    _loadParticipant("aktif", "all");
                   }).catchError((err) {
                     print(err);
                   });
-                  Navigator.of(context).pop();
+                 
                 },
               ),
               new FlatButton(
@@ -825,7 +704,7 @@ class _MainScreenState extends State<MainScreen> {
         });
   }
 
-  _updateStatus(int index) {
+  _updateStatus(int index,String pass) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -852,7 +731,7 @@ class _MainScreenState extends State<MainScreen> {
               ),
               onPressed: () => {
                 Navigator.of(context).pop(),
-                finalChangeStatus(index),
+                finalChangeStatus(index, pass),
                 _loadParticipant("aktif", "all")
               },
             ),
@@ -873,7 +752,7 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  finalChangeStatus(int index) async {
+  finalChangeStatus(int index, String pass) async {
     String icno = recordlist[index]['icno'];
     ProgressDialog pr = new ProgressDialog(context,
         type: ProgressDialogType.Normal, isDismissible: true);
@@ -881,7 +760,7 @@ class _MainScreenState extends State<MainScreen> {
     await pr.show();
     String urlLoadJobs = "https://slumberjer.com/ayam/php/update_status.php";
     http
-        .post(urlLoadJobs, body: {"icno": icno, "status": "selesai"})
+        .post(urlLoadJobs, body: {"icno": icno, "status": "selesai", "pass": pass})
         .timeout(const Duration(seconds: 10))
         .then((res) {
           print(res.body);

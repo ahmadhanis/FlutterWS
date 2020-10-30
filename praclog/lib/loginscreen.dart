@@ -242,7 +242,7 @@ class _LoginScreenState extends State<LoginScreen> {
             color: Colors.white,
           ),
           Text(
-            " MY.PRACTICUM",
+            " MY.LOGBOOK",
             style: TextStyle(
                 fontSize: 36, color: Colors.white, fontWeight: FontWeight.w900),
           )

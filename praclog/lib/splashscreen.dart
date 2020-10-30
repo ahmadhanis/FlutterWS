@@ -31,7 +31,7 @@ class _MyAppState extends State<MyApp> {
           Theme.of(context).textTheme,
         ),
       ),
-      title: 'My Practicum',
+      title: 'MyLogBook',
       home: Scaffold(
           body: Container(
         child: Stack(
@@ -41,10 +41,34 @@ class _MyAppState extends State<MyApp> {
                     image: DecorationImage(
                         image: AssetImage('assets/images/splash.png'),
                         fit: BoxFit.cover))),
-            Container(height: 300, child: ProgressIndicator())
+            Container(height: 300, child: ProgressIndicator()),
+            pageTitle(),
           ],
         ),
       )),
+    );
+  }
+
+  Widget pageTitle() {
+    return Container(
+      //color: Color.fromRGBO(255, 200, 200, 200),
+      margin: EdgeInsets.only(top: 60),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Icon(
+            Icons.book,
+            size: 40,
+            color: Colors.white,
+          ),
+          Text(
+            " MY.LOGBOOK",
+            style: TextStyle(
+                fontSize: 36, color: Colors.white, fontWeight: FontWeight.w900),
+          )
+        ],
+      ),
     );
   }
 }
@@ -101,6 +125,7 @@ class _ProgressIndicatorState extends State<ProgressIndicator>
       ),
     ));
   }
+ 
 
   // void loadpref(BuildContext ctx) async {
   //   print('Inside loadpref()');

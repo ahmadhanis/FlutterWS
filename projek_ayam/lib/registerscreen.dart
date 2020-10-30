@@ -23,6 +23,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Position _currentPosition;
   double latitude, longitude;
   String selectedLocation;
+  Geolocator geolocator;
   String pathAsset = 'assets/images/camera.png';
   String urlRegister = "https://slumberjer.com/ayam/php/register_user.php";
   TextEditingController _nameEditingController = new TextEditingController();
@@ -46,6 +47,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void initState() {
     super.initState();
     _getLocation();
+  }
+
+  @override
+  void dispose() {
+    print("**** dispose");
+    geolocator.getPositionStream(null).listen(null);
+    super.dispose();
   }
 
   @override
@@ -100,7 +108,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               SizedBox(height: 5),
               GestureDetector(
-                  onTap: () => {_choose()},
+                  onTap: () => {_onPictureSelection()},
                   child: Container(
                     height: screenHeight / 4.5,
                     width: screenWidth / 1.5,
@@ -294,22 +302,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  void _choose() async {
-    final picker = ImagePicker();
-    // _image = await ImagePicker.pickImage(
-    //     source: ImageSource.camera, maxHeight: 800, maxWidth: 800);
-    final pickedFile = await picker.getImage(
-        source: ImageSource.camera, maxHeight: 800, maxWidth: 800);
-    setState(() {
-      if (pickedFile != null) {
-        _image = File(pickedFile.path);
-      } else {
-        print('No image selected.');
-      }
-    });
-    _cropImage();
-    setState(() {});
-  }
+  // void _choose() async {
+  //   final picker = ImagePicker();
+  //   // _image = await ImagePicker.pickImage(
+  //   //     source: ImageSource.camera, maxHeight: 800, maxWidth: 800);
+  //   final pickedFile = await picker.getImage(
+  //       source: ImageSource.camera, maxHeight: 800, maxWidth: 800);
+  //   setState(() {
+  //     if (pickedFile != null) {
+  //       _image = File(pickedFile.path);
+  //     } else {
+  //       print('No image selected.');
+  //     }
+  //   });
+  //   _cropImage();
+  //   setState(() {});
+  // }
 
   Future<Null> _cropImage() async {
     File croppedFile = await ImageCropper.cropImage(
@@ -478,7 +486,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (res.body == "success") {
         Navigator.pop(context,
             MaterialPageRoute(builder: (BuildContext context) => MainScreen()));
-        Toast.show("Pendaftara berjaya", context,
+        Toast.show("Pendaftaran berjaya", context,
             duration: Toast.LENGTH_LONG, gravity: Toast.TOP);
       } else {
         Toast.show("Pendaftaran gagal", context,
@@ -491,7 +499,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   _getLocation() async {
-    final Geolocator geolocator = Geolocator()..forceAndroidLocationManager;
+    geolocator = Geolocator()..forceAndroidLocationManager;
     _currentPosition = await geolocator
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
         .timeout(Duration(seconds: 15), onTimeout: () {
@@ -509,55 +517,92 @@ class _RegisterScreenState extends State<RegisterScreen> {
         MaterialPageRoute(builder: (BuildContext context) => MainScreen()));
   }
 
-  // void _showEULA() {
-  //   // flutter defined function
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       // return object of type Dialog
-  //       return AlertDialog(
-  //         title: new Text(
-  //           "EULA",
-  //           style: TextStyle(
-  //             color: Colors.white,
-  //           ),
-  //         ),
-  //         content: new Container(
-  //           height: screenHeight / 2,
-  //           child: Column(
-  //             children: <Widget>[
-  //               Expanded(
-  //                 flex: 1,
-  //                 child: new SingleChildScrollView(
-  //                   child: RichText(
-  //                       softWrap: true,
-  //                       textAlign: TextAlign.justify,
-  //                       text: TextSpan(
-  //                           style: TextStyle(
-  //                             color: Colors.white,
-  //                             //fontWeight: FontWeight.w500,
-  //                             fontSize: 12.0,
-  //                           ),
-  //                           text:
-  //                               "This End-User License Agreement is a legal agreement between you and Slumberjer This EULA agreement governs your acquisition and use of our MY.AYAM software (Software) directly from Slumberjer or indirectly through a Slumberjer authorized reseller or distributor (a Reseller).Please read this EULA agreement carefully before completing the installation process and using the MY.AYAM software. It provides a license to use the MY.AYAM software and contains warranty information and liability disclaimers. If you register for a free trial of the MY.AYAM software, this EULA agreement will also govern that trial. By clicking accept or installing and/or using the MY.AYAM software, you are confirming your acceptance of the Software and agreeing to become bound by the terms of this EULA agreement. If you are entering into this EULA agreement on behalf of a company or other legal entity, you represent that you have the authority to bind such entity and its affiliates to these terms and conditions. If you do not have such authority or if you do not agree with the terms and conditions of this EULA agreement, do not install or use the Software, and you must not accept this EULA agreement.This EULA agreement shall apply only to the Software supplied by Slumberjer herewith regardless of whether other software is referred to or described herein. The terms also apply to any Slumberjer updates, supplements, Internet-based services, and support services for the Software, unless other terms accompany those items on delivery. If so, those terms apply. This EULA was created by EULA Template for MY.AYAM. Slumberjer shall at all times retain ownership of the Software as originally downloaded by you and all subsequent downloads of the Software by you. The Software (and the copyright, and other intellectual property rights of whatever nature in the Software, including any modifications made thereto) are and shall remain the property of Slumberjer. Slumberjer reserves the right to grant licences to use the Software to third parties"
-  //                           //children: getSpan(),
-  //                           )),
-  //                 ),
-  //               )
-  //             ],
-  //           ),
-  //         ),
-  //         actions: <Widget>[
-  //           // usually buttons at the bottom of the dialog
-  //           new FlatButton(
-  //             child: new Text("Close"),
-  //             onPressed: () {
-  //               Navigator.of(context).pop();
-  //             },
-  //           )
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
+  _onPictureSelection() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+            //backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(20.0))),
+            content: new Container(
+              //color: Colors.white,
+              height: screenHeight / 4,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                      alignment: Alignment.center,
+                      child: Text(
+                        "Ambil gambar dari:",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16),
+                      )),
+                  SizedBox(height: 5),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                          child: MaterialButton(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5.0)),
+                        minWidth: 100,
+                        height: 100,
+                        child: Text('Kamera',
+                            style: TextStyle(
+                              color: Colors.black,
+                            )),
+                        color: Color.fromRGBO(101, 255, 218, 50),
+                        textColor: Colors.white,
+                        elevation: 10,
+                        onPressed: () =>
+                            {Navigator.pop(context), _chooseCamera()},
+                      )),
+                      SizedBox(width: 10),
+                      Flexible(
+                          child: MaterialButton(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5.0)),
+                        minWidth: 100,
+                        height: 100,
+                        child: Text('Galeri',
+                            style: TextStyle(
+                              color: Colors.black,
+                            )),
+                        color: Color.fromRGBO(101, 255, 218, 50),
+                        textColor: Colors.white,
+                        elevation: 10,
+                        onPressed: () => {
+                          Navigator.pop(context),
+                          _chooseGallery(),
+                        },
+                      )),
+                    ],
+                  ),
+                ],
+              ),
+            ));
+      },
+    );
+  }
+
+  void _chooseCamera() async {
+    // ignore: deprecated_member_use
+    _image = await ImagePicker.pickImage(
+        source: ImageSource.camera, maxHeight: 800, maxWidth: 800);
+    _cropImage();
+    setState(() {});
+  }
+
+  void _chooseGallery() async {
+    // ignore: deprecated_member_use
+    _image = await ImagePicker.pickImage(
+        source: ImageSource.gallery, maxHeight: 800, maxWidth: 800);
+    _cropImage();
+    setState(() {});
+  }
 }

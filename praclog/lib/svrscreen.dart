@@ -97,7 +97,7 @@ class _SvrScreenState extends State<SvrScreen> {
               : Flexible(
                   child: GridView.count(
                   crossAxisCount: 1,
-                  childAspectRatio: (screenWidth / screenHeight) / 0.25,
+                  childAspectRatio: (screenWidth / screenHeight) / 0.2,
                   children: List.generate(recordlist.length, (index) {
                     return Padding(
                         padding: EdgeInsets.all(1),
@@ -133,6 +133,7 @@ class _SvrScreenState extends State<SvrScreen> {
                                     Expanded(
                                       flex: 4,
                                       child: Container(
+                                          child: SingleChildScrollView(
                                         child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
@@ -167,7 +168,7 @@ class _SvrScreenState extends State<SvrScreen> {
                                                     color: Colors.white)),
                                           ],
                                         ),
-                                      ),
+                                      )),
                                     ),
                                     Flexible(
                                         fit: FlexFit.tight,

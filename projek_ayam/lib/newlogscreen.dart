@@ -29,10 +29,14 @@ class _NewLogScreenState extends State<NewLogScreen> {
   TextEditingController _svrEditingController = new TextEditingController();
   TextEditingController _aliveEditingController = new TextEditingController();
   TextEditingController _deadEditingController = new TextEditingController();
+  TextEditingController _lostEditingController = new TextEditingController();
+  TextEditingController _sickEditingController = new TextEditingController();
   final focus = FocusNode();
   final focus1 = FocusNode();
   final focus2 = FocusNode();
   final focus3 = FocusNode();
+  final focus4 = FocusNode();
+  final focus5 = FocusNode();
   @override
   void initState() {
     super.initState();
@@ -102,7 +106,7 @@ class _NewLogScreenState extends State<NewLogScreen> {
                                           keyboardType: TextInputType.text,
                                           textInputAction: TextInputAction.next,
                                           decoration: InputDecoration(
-                                            labelText: 'Nama pelawat',
+                                            labelText: 'Nama Pemantau',
                                             icon: Icon(Icons.person),
                                           )),
                                       SizedBox(height: 10),
@@ -156,6 +160,56 @@ class _NewLogScreenState extends State<NewLogScreen> {
                                           )
                                         ],
                                       ),
+                                      Row(
+                                        children: [
+                                          Flexible(
+                                            child: TextFormField(
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                              ),
+                                              focusNode: focus3,
+                                              onFieldSubmitted: (v) {
+                                                FocusScope.of(context)
+                                                    .requestFocus(focus4);
+                                              },
+                                              controller:
+                                                  _sickEditingController,
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              textInputAction:
+                                                  TextInputAction.next,
+                                              decoration: InputDecoration(
+                                                labelText: 'Bil Singkir/Sakit',
+                                                icon:
+                                                    Icon(MdiIcons.emoticonDead),
+                                              ),
+                                            ),
+                                          ),
+                                          Flexible(
+                                            child: TextFormField(
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                              ),
+                                              focusNode: focus4,
+                                              onFieldSubmitted: (v) {
+                                                FocusScope.of(context)
+                                                    .requestFocus(focus5);
+                                              },
+                                              controller:
+                                                  _lostEditingController,
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              textInputAction:
+                                                  TextInputAction.next,
+                                              decoration: InputDecoration(
+                                                labelText: 'Bil Hilang',
+                                                icon:
+                                                    Icon(MdiIcons.emoticonDead),
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
                                       SizedBox(height: 10),
                                       Text(
                                         "Ulasan anda",
@@ -173,7 +227,7 @@ class _NewLogScreenState extends State<NewLogScreen> {
                                               style: TextStyle(
                                                 color: Colors.white,
                                               ),
-                                              focusNode: focus3,
+                                              focusNode: focus5,
                                               controller: desccontroller,
                                               keyboardType:
                                                   TextInputType.multiline,
@@ -181,7 +235,7 @@ class _NewLogScreenState extends State<NewLogScreen> {
                                                   TextInputAction.done,
                                               decoration: new InputDecoration(
                                                 hintText:
-                                                    "Beri ulasan ringkas.",
+                                                    "Buku log, kebersihan reban, peralatan makanan dan minuman ayam dll",
                                                 contentPadding:
                                                     const EdgeInsets.all(5),
 
@@ -346,19 +400,20 @@ class _NewLogScreenState extends State<NewLogScreen> {
   }
 
   void newLogDialog() {
-    String desc = desccontroller.text;
-
     if (_image == null) {
       Toast.show("Sila ambil gambar dahulu!.", context,
           duration: Toast.LENGTH_LONG, gravity: Toast.TOP);
       return;
     }
-    if (desc == "") {
-      Toast.show("Sila isi penerangan!.", context,
+    if (_aliveEditingController.text == "" ||
+        _deadEditingController.text == "" ||
+        _lostEditingController.text == "" ||
+        _sickEditingController.text == "" ||
+        _svrEditingController.text == "") {
+      Toast.show("Sila penuhi semua input diperlukan!.", context,
           duration: Toast.LENGTH_LONG, gravity: Toast.TOP);
       return;
     }
-
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -419,9 +474,11 @@ class _NewLogScreenState extends State<NewLogScreen> {
     String urlLoadJobs = "https://slumberjer.com/ayam/php/new_log.php";
     await http.post(urlLoadJobs, body: {
       "icno": widget.user.icno,
-      "supervisor": _svrEditingController.text,
+      "supervisor": toBeginningOfSentenceCase(_svrEditingController.text),
       "alive": _aliveEditingController.text,
       "dead": _deadEditingController.text,
+      "lost": _lostEditingController.text,
+      "sick": _sickEditingController.text,
       "description": toBeginningOfSentenceCase(desccontroller.text),
       "imagename": widget.user.icno + "-${dateTime.microsecondsSinceEpoch}",
       "encoded_string": base64Image,
