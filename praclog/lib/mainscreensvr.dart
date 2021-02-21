@@ -39,7 +39,7 @@ class _MainScreenSvrState extends State<MainScreenSvr> {
   final f = new DateFormat('dd/MM/yyyy');
   final fb = new DateFormat('hh:mm a');
   final fc = new DateFormat('dd/MM/yyyy hh:mm a');
-
+  bool _updatesuccess = false;
   var dateUtility;
   var numdaymonth;
 
@@ -285,23 +285,44 @@ class _MainScreenSvrState extends State<MainScreenSvr> {
                                 padding: EdgeInsets.all(3),
                                 child: Row(
                                   children: <Widget>[
-                                    CircleAvatar(
-                                      backgroundColor: Theme.of(context)
-                                                  .platform ==
-                                              TargetPlatform.android
-                                          ? Color.fromRGBO(101, 255, 218, 50)
-                                          : Color.fromRGBO(101, 255, 218, 50),
-                                      child: Text(
-                                        fa.format(DateTime.parse(
-                                            recordlist[index]['date'])),
-                                        style: TextStyle(fontSize: 16.0),
-                                      ),
+                                    Column(
+                                      children: [
+                                        SizedBox(
+                                          height: 3,
+                                        ),
+                                        CircleAvatar(
+                                          backgroundColor:
+                                              Theme.of(context).platform ==
+                                                      TargetPlatform.android
+                                                  ? Color.fromRGBO(
+                                                      101, 255, 218, 50)
+                                                  : Color.fromRGBO(
+                                                      101, 255, 218, 50),
+                                          child: Text(
+                                            fa.format(DateTime.parse(
+                                                recordlist[index]['date'])),
+                                            style: TextStyle(fontSize: 16.0),
+                                          ),
+                                        ),
+                                        Text(
+                                            toBeginningOfSentenceCase(
+                                                recordlist[index]['status']),
+                                            maxLines: 4,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              color: (recordlist[index]
+                                                          ['status'] ==
+                                                      "read")
+                                                  ? Colors.green
+                                                  : Colors.red,
+                                            )),
+                                      ],
                                     ),
                                     SizedBox(
                                       width: 10,
                                     ),
                                     Expanded(
-                                      child:SingleChildScrollView(
+                                        child: SingleChildScrollView(
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
@@ -609,71 +630,100 @@ class _MainScreenSvrState extends State<MainScreenSvr> {
     _loadRecord(selectedMonth, selectedYear);
   }
 
-  _onLogDetail(int index) {
-    showDialog(
+  _onLogDetail(int index) async {
+    if (recordlist[index]['status'] == "unread") {
+      _updateStatus(index);
+    }
+    await showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-            //backgroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(20.0))),
-            content: new Container(
-              //color: Colors.white,
-              height: screenHeight / 1.5,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  Container(
-                      height: screenHeight / 3.8,
-                      width: screenWidth / 1.2,
-                      child: CachedNetworkImage(
-                        imageUrl:
-                            "https://slumberjer.com/prak/jobimages/${recordlist[index]['imagename']}.png",
-                        fit: BoxFit.fill,
-                        placeholder: (context, url) =>
-                            new CircularProgressIndicator(),
-                        errorWidget: (context, url, error) => new Icon(
-                          MdiIcons.imageBroken,
-                          size: screenWidth / 2,
-                        ),
-                      )),
-                  Divider(
-                    color: Colors.white,
-                  ),
-                  Container(
-                      alignment: Alignment.center,
-                      child: Text("Description",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold))),
-                  Container(
-                    height: screenHeight / 3.2,
-                    child: Column(
-                      children: <Widget>[
-                        Expanded(
-                          flex: 1,
-                          child: new SingleChildScrollView(
-                            child: Text(recordlist[index]['description'],
-                                softWrap: true,
-                                textAlign: TextAlign.justify,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                )
-
-                                //children: getSpan(),
-                                ),
+        return StatefulBuilder(builder: (context, StateSetter setState) {
+          return AlertDialog(
+              //backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20.0))),
+              content: new Container(
+                //color: Colors.white,
+                height: screenHeight / 1.5,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    Container(
+                        height: screenHeight / 3.8,
+                        width: screenWidth / 1.2,
+                        child: CachedNetworkImage(
+                          imageUrl:
+                              "https://slumberjer.com/prak/jobimages/${recordlist[index]['imagename']}.png",
+                          fit: BoxFit.fill,
+                          placeholder: (context, url) =>
+                              new CircularProgressIndicator(),
+                          errorWidget: (context, url, error) => new Icon(
+                            MdiIcons.imageBroken,
+                            size: screenWidth / 2,
                           ),
-                        )
-                      ],
+                        )),
+                    Divider(
+                      color: Colors.white,
                     ),
-                  ),
-                ],
-              ),
-            ));
+                    Container(
+                        alignment: Alignment.center,
+                        child: Text("Description",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold))),
+                    Container(
+                      height: screenHeight / 3.2,
+                      child: Column(
+                        children: <Widget>[
+                          Expanded(
+                            flex: 1,
+                            child: new SingleChildScrollView(
+                              child: Text(recordlist[index]['description'],
+                                  softWrap: true,
+                                  textAlign: TextAlign.justify,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                  )
+
+                                  //children: getSpan(),
+                                  ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ));
+        });
       },
-    );
+    ).then((val) {
+      if (_updatesuccess) {
+        _loadRecord(curmonth, curyear);
+        _updatesuccess = false;
+      }
+    });
+  }
+
+  Future<void> _updateStatus(int index) async {
+    String urlLoadJobs = "https://slumberjer.com/prak/php/update_read.php";
+    http
+        .post(urlLoadJobs, body: {
+          "recid": recordlist[index]['recid'],
+        })
+        .timeout(const Duration(seconds: 10))
+        .then((res) {
+          print(res.body);
+          if (res.body == "success") {
+            recordlist[index]['state'] = "read";
+            _updatesuccess = true;
+          }
+        })
+        .catchError((err) {
+          print(err);
+        });
   }
 }

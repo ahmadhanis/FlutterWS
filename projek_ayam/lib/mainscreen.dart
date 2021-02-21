@@ -79,12 +79,12 @@ class _MainScreenState extends State<MainScreen> {
                   child: Icon(MdiIcons.bagPersonal),
                   label: "Peserta Aktif",
                   labelBackgroundColor: Colors.white,
-                  onTap: () => _loadParticipant("aktif", "all")),
+                  onTap: () => _loadParticipant("aktif", selectedLocation)),
               SpeedDialChild(
                   child: Icon(MdiIcons.history),
                   label: "Peserta Lama",
                   labelBackgroundColor: Colors.white,
-                  onTap: () => _loadParticipant("selesai", "all")),
+                  onTap: () => _loadParticipant("selesai", selectedLocation)),
               SpeedDialChild(
                   child: Icon(MdiIcons.accountGroup),
                   label: "Daftar Peserta",
@@ -514,7 +514,7 @@ class _MainScreenState extends State<MainScreen> {
       manager.emptyCache();
       imageCache.clear();
     });
-    _loadParticipant("aktif", "all");
+    _loadParticipant("aktif", selectedLocation);
   }
 
   _onLogDetailQR() {
@@ -546,7 +546,7 @@ class _MainScreenState extends State<MainScreen> {
   Future<void> _registerScreen() async {
     await Navigator.push(context,
         MaterialPageRoute(builder: (BuildContext context) => RegisterScreen()));
-    _loadParticipant("aktif", "all");
+    _loadParticipant("aktif", selectedLocation);
   }
 
   
@@ -676,7 +676,7 @@ class _MainScreenState extends State<MainScreen> {
                       Toast.show("Berjaya", context,
                           duration: Toast.LENGTH_LONG, gravity: Toast.TOP);
                            Navigator.of(context).pop();
-                          _loadParticipant("aktif", "all");
+                          _loadParticipant("aktif", selectedLocation);
                     } else {
                       Toast.show("Gagal", context,
                           duration: Toast.LENGTH_LONG, gravity: Toast.TOP);
@@ -732,7 +732,7 @@ class _MainScreenState extends State<MainScreen> {
               onPressed: () => {
                 Navigator.of(context).pop(),
                 finalChangeStatus(index, pass),
-                _loadParticipant("aktif", "all")
+                _loadParticipant("aktif", selectedLocation)
               },
             ),
             new FlatButton(

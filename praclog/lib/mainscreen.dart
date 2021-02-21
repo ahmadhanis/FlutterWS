@@ -45,6 +45,8 @@ class _MainScreenState extends State<MainScreen> {
 
   var dateUtility;
   var numdaymonth;
+  Color textred = Colors.red;
+  Color textgreen = Colors.green;
 
   List<String> monthlist = [
     "January",
@@ -298,18 +300,32 @@ class _MainScreenState extends State<MainScreen> {
                                 padding: EdgeInsets.all(3),
                                 child: Row(
                                   children: <Widget>[
-                                    CircleAvatar(
-                                      backgroundColor: Theme.of(context)
-                                                  .platform ==
-                                              TargetPlatform.android
-                                          ? Color.fromRGBO(101, 255, 218, 50)
-                                          : Color.fromRGBO(101, 255, 218, 50),
-                                      child: Text(
-                                        fa.format(DateTime.parse(
-                                            recordlist[index]['date'])),
-                                        style: TextStyle(fontSize: 16.0),
+                                    Column(children: [
+                                      SizedBox(height: 3),
+                                      CircleAvatar(
+                                        backgroundColor: Theme.of(context)
+                                                    .platform ==
+                                                TargetPlatform.android
+                                            ? Color.fromRGBO(101, 255, 218, 50)
+                                            : Color.fromRGBO(101, 255, 218, 50),
+                                        child: Text(
+                                          fa.format(DateTime.parse(
+                                              recordlist[index]['date'])),
+                                          style: TextStyle(fontSize: 16.0),
+                                        ),
                                       ),
-                                    ),
+                                      Text(
+                                          StringUtils.capitalize(
+                                              recordlist[index]['status']),
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            color: (recordlist[index]
+                                                        ['status'] ==
+                                                    "read")
+                                                ? Colors.green
+                                                : Colors.red,
+                                          )),
+                                    ]),
                                     SizedBox(
                                       width: 10,
                                     ),
