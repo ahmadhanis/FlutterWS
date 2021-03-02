@@ -11,9 +11,11 @@ class BooksController extends GetxController {
   void onInit() {
     super.onInit();
     fetchBooks();
+    print("in INIT");
   }
 
   void fetchBooks() async {
+    print("in FETCH");
     await http.post("https://slumberjer.com/mylibrary/php/loadbooks.php",
         body: {}).then((res) {
       if (res.body == null) {
@@ -21,8 +23,6 @@ class BooksController extends GetxController {
       } else {
         var jsondata = json.decode(res.body);
         var listbooks = jsondata["books"];
-
-        print(listbooks);
         for (int i = 0; i < listbooks.length; i++) {
           books.add(Book(
               title: listbooks[i]['title'],
@@ -32,6 +32,20 @@ class BooksController extends GetxController {
               price: listbooks[i]['price']));
         }
       }
+    }).catchError((err) {
+      print(err);
+    });
+  }
+
+  void deleteBook(String bookid) async {
+    print("in Delete");
+    await http
+        .post("https://slumberjer.com/mylibrary/php/deletebook.php", body: {
+      "bookid": bookid,
+    }).then((res) {
+      print(res.body);
+      if (res.body == "success") {
+      } else {}
     }).catchError((err) {
       print(err);
     });

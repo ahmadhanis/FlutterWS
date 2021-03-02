@@ -11,4 +11,5 @@ class Book {
     this.price,
   });
   final isFavorite = false.obs;
+  
 }
