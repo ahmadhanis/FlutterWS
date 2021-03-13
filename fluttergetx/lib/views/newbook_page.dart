@@ -1,32 +1,26 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttergetx/controllers/books_controller.dart';
+import 'package:fluttergetx/controllers/imagecontroller.dart';
 import 'package:get/get.dart';
 
 class NewBookPage extends StatelessWidget {
   final bookController = Get.put(BooksController());
+  final imageController = Get.put(ImageController());
 
   @override
   Widget build(BuildContext context) {
     double screenHeight, screenWidth;
-    File _image;
-    String pathAsset = "assets/images/uum.png";
-    List<String> listType = [
-      "Novel",
-      "Education",
-      "Magazine",
-      "Fiction",
-      "Other",
-    ].obs;
-    TextEditingController booktitlectrl = new TextEditingController();
-    TextEditingController bookdescctrl = new TextEditingController();
-    String selectedType;
 
-    screenHeight = MediaQuery.of(context).size.height;
-    screenWidth = MediaQuery.of(context).size.width;
+    String pathAsset = "assets/images/uum.png";
+
+    screenHeight = Get.height;
+    screenWidth = Get.width;
 
     return Scaffold(
-      backgroundColor: Colors.teal,
+      //backgroundColor: Colors.teal,
+      appBar: AppBar(
+        elevation: 0,
+      ),
       body: SafeArea(
           child: SingleChildScrollView(
               child: Padding(
@@ -36,14 +30,14 @@ class NewBookPage extends StatelessWidget {
             Center(),
             GestureDetector(
                 onTap: () => {_onPictureSelection()},
-                child: Container(
+                child:Container(
                   height: screenHeight / 3.2,
                   width: screenWidth / 1.8,
-                  decoration: BoxDecoration(
+                  decoration:  BoxDecoration(
                     image: DecorationImage(
-                      image: _image == null
+                      image: imageController.image == null
                           ? AssetImage(pathAsset)
-                          : FileImage(_image),
+                          : FileImage(imageController.image),
                       fit: BoxFit.cover,
                     ),
                     border: Border.all(
@@ -60,7 +54,7 @@ class NewBookPage extends StatelessWidget {
                 style: TextStyle(fontSize: 14.0, color: Colors.black)),
             SizedBox(height: 5),
             TextField(
-                controller: booktitlectrl,
+                controller: bookController.booktitlectrl,
                 keyboardType: TextInputType.text,
                 decoration: InputDecoration(
                     labelText: 'Book Title', icon: Icon(Icons.book))),
@@ -69,32 +63,27 @@ class NewBookPage extends StatelessWidget {
               children: [
                 Icon(Icons.menu_book, color: Colors.grey),
                 SizedBox(width: 15),
-                GetX<BooksController>(builder: (controller) {
-                  return DropdownButton(
-                    hint: Text(
-                      'Book Type',
-                      style: TextStyle(
-                        color: Color.fromRGBO(253, 72, 13, 50),
+                Obx(() => DropdownButton(
+                      hint: Text(
+                        'Book Type',
                       ),
-                    ),
-                    onChanged: (newValue) {
-                      
-                    },
-                    value: selectedType,
-                    items: listType.map((selectedType) {
-                      return DropdownMenuItem(
-                        child: new Text(
-                          selectedType,
-                        ),
-                        value: selectedType,
-                      );
-                    }).toList(),
-                  );
-                }),
+                      onChanged: (newValue) {
+                        bookController.setSelected(newValue);
+                      },
+                      value: bookController.selected.value,
+                      items: bookController.listType.map((selectedType) {
+                        return DropdownMenuItem(
+                          child: new Text(
+                            selectedType,
+                          ),
+                          value: selectedType,
+                        );
+                      }).toList(),
+                    )),
               ],
             ),
             TextField(
-                controller: bookdescctrl,
+                controller: bookController.bookdescctrl,
                 keyboardType: TextInputType.multiline,
                 maxLines: 5,
                 minLines: 5,
@@ -118,7 +107,12 @@ class NewBookPage extends StatelessWidget {
     );
   }
 
-  _onPictureSelection() {}
+  _onPictureSelection() async {
+     imageController.getImage();
+  }
 
-  void _insertNewBookDialog() {}
+ 
+  void _insertNewBookDialog() {
+    print(imageController.image.path);
+  }
 }

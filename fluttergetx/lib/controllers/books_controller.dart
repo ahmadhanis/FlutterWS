@@ -1,53 +1,92 @@
-import 'dart:convert';
-
+import 'package:flutter/material.dart';
 import 'package:fluttergetx/models/book.dart';
+import 'package:fluttergetx/services/remote_services.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
 
 class BooksController extends GetxController {
-  List books = List<Book>().obs;
+  static BooksController get to => Get.find<BooksController>();
+
+  var bookList = <Book>[].obs;
+  var isLoading = true.obs;
+  var statusMsj = "Loading".obs;
+  final selected = "Novel".obs;
+
+  void setSelected(String value) {
+    selected.value = value;
+  }
+
+  TextEditingController booktitlectrl;
+  TextEditingController bookdescctrl;
+
+  List<String> listType = [
+    "Novel",
+    "Education",
+    "Magazine",
+    "Fiction",
+    "Other",
+  ];
 
   @override
   void onInit() {
-    super.onInit();
+    booktitlectrl = new TextEditingController();
+    bookdescctrl = new TextEditingController();
     fetchBooks();
-    print("in INIT");
+    super.onInit();
   }
 
   void fetchBooks() async {
-    print("in FETCH");
-    await http.post("https://slumberjer.com/mylibrary/php/loadbooks.php",
-        body: {}).then((res) {
-      if (res.body == null) {
-        books = null;
+    try {
+      isLoading(true);
+      var books = await RemoteServices.fetchBooks();
+      if (books != null) {
+        bookList.assignAll(books);
       } else {
-        var jsondata = json.decode(res.body);
-        var listbooks = jsondata["books"];
-        for (int i = 0; i < listbooks.length; i++) {
-          books.add(Book(
-              title: listbooks[i]['title'],
-              bookid: listbooks[i]['bookid'],
-              description: listbooks[i]['description'],
-              type: listbooks[i]['type'],
-              price: listbooks[i]['price']));
-        }
+        bookList = null;
+        statusMsj("No data");
       }
-    }).catchError((err) {
-      print(err);
-    });
+    } finally {
+      isLoading(false);
+    }
   }
 
-  void deleteBook(String bookid) async {
-    print("in Delete");
-    await http
-        .post("https://slumberjer.com/mylibrary/php/deletebook.php", body: {
-      "bookid": bookid,
-    }).then((res) {
-      print(res.body);
-      if (res.body == "success") {
-      } else {}
-    }).catchError((err) {
-      print(err);
-    });
+  void loadBooks() async {
+    try {
+      isLoading(true);
+      var books = await RemoteServices.fetchBooks();
+      if (books != null) {
+        bookList.assignAll(books);
+      } else {
+        bookList = null;
+        statusMsj("No data");
+      }
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  void deleteBook(book) async {
+    try {
+      isLoading(true);
+      var resp = await RemoteServices.deleteBook(book.bookid);
+      if (resp == "success") {
+        fetchBooks();
+      }
+      print(resp);
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  void newBook(book) async {
+    try {
+      isLoading(true);
+      var resp = await RemoteServices.deleteBook(book.bookid);
+      if (resp == "success") {
+        fetchBooks();
+      }
+      print(resp);
+    } finally {
+      isLoading(false);
+    }
   }
 }
