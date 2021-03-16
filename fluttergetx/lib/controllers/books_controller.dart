@@ -17,6 +17,7 @@ class BooksController extends GetxController {
 
   TextEditingController booktitlectrl;
   TextEditingController bookdescctrl;
+  TextEditingController bookpricectrl;
 
   List<String> listType = [
     "Novel",
@@ -30,6 +31,7 @@ class BooksController extends GetxController {
   void onInit() {
     booktitlectrl = new TextEditingController();
     bookdescctrl = new TextEditingController();
+    bookpricectrl = new TextEditingController();
     fetchBooks();
     super.onInit();
   }
@@ -80,7 +82,7 @@ class BooksController extends GetxController {
   void newBook(book) async {
     try {
       isLoading(true);
-      var resp = await RemoteServices.deleteBook(book.bookid);
+      var resp = await RemoteServices.newBook(book);
       if (resp == "success") {
         fetchBooks();
       }

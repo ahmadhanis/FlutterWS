@@ -12,7 +12,7 @@ class RemoteServices {
         return null;
       } else {
         var jsonString = response.body;
-        print("IN remoteservices"+jsonString);
+        print("IN remoteservices" + jsonString);
         return booksFromJson(jsonString);
       }
     } else {
@@ -25,6 +25,26 @@ class RemoteServices {
     var response = await client.post(
         'https://slumberjer.com/mylibrary/php/deletebook.php',
         body: {"bookid": bookid});
+    if (response.statusCode == 200) {
+      var resp = response.body;
+      return resp;
+    } else {
+      //show error message
+      return null;
+    }
+  }
+
+  static Future<String> newBook(book) async {
+    var response = await client
+        .post('https://slumberjer.com/mylibrary/php/insertbook.php', body: {
+      "email": book.email,
+      "booktitle": book.title,
+      "booktype": book.type,
+      "bookdesc": book.description,
+      "bookprice":book.price,
+      "bookrating":book.rating,
+      "encoded_string": book.base64Image,
+    });
     if (response.statusCode == 200) {
       var resp = response.body;
       return resp;

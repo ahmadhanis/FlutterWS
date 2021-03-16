@@ -1,6 +1,9 @@
+import 'dart:convert';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttergetx/controllers/books_controller.dart';
 import 'package:fluttergetx/controllers/imagecontroller.dart';
+import 'package:fluttergetx/models/book.dart';
 import 'package:get/get.dart';
 
 class NewBookPage extends StatelessWidget {
@@ -10,7 +13,7 @@ class NewBookPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double screenHeight, screenWidth;
-
+    String bookrating = "0";
     String pathAsset = "assets/images/uum.png";
 
     screenHeight = Get.height;
@@ -30,25 +33,28 @@ class NewBookPage extends StatelessWidget {
             Center(),
             GestureDetector(
                 onTap: () => {_onPictureSelection()},
-                child:Container(
-                  height: screenHeight / 3.2,
-                  width: screenWidth / 1.8,
-                  decoration:  BoxDecoration(
-                    image: DecorationImage(
-                      image: imageController.image == null
-                          ? AssetImage(pathAsset)
-                          : FileImage(imageController.image),
-                      fit: BoxFit.cover,
-                    ),
-                    border: Border.all(
-                      width: 3.0,
-                      color: Colors.grey,
-                    ),
-                    borderRadius: BorderRadius.all(
-                        Radius.circular(5.0) //         <--- border radius here
-                        ),
-                  ),
-                )),
+                child: GetBuilder<ImageController>(
+                    // specify type as Controller
+                    init: ImageController(), // intialize with the Controller
+                    builder: (value) => Container(
+                          height: screenHeight / 3.2,
+                          width: screenWidth / 1.8,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: imageController.image == null
+                                  ? AssetImage(pathAsset)
+                                  : FileImage(imageController.image),
+                              fit: BoxFit.cover,
+                            ),
+                            border: Border.all(
+                              width: 3.0,
+                              color: Colors.grey,
+                            ),
+                            borderRadius: BorderRadius.all(Radius.circular(
+                                    5.0) //         <--- border radius here
+                                ),
+                          ),
+                        ))),
             SizedBox(height: 5),
             Text("Click image to take picture ",
                 style: TextStyle(fontSize: 14.0, color: Colors.black)),
@@ -83,6 +89,34 @@ class NewBookPage extends StatelessWidget {
               ],
             ),
             TextField(
+                controller: bookController.bookpricectrl,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                    labelText: 'Book Price', icon: Icon(Icons.money))),
+            SizedBox(height: 10),
+            Row(
+              children: [
+                Icon(Icons.star, color: Colors.grey),
+                SizedBox(width: 10),
+                RatingBar.builder(
+                  initialRating: 3,
+                  minRating: 1,
+                  direction: Axis.horizontal,
+                  allowHalfRating: true,
+                  itemCount: 5,
+                  itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                  itemBuilder: (context, _) => Icon(
+                    Icons.star,
+                    color: Colors.amber,
+                  ),
+                  onRatingUpdate: (rating) {
+                    print(rating);
+                    bookrating = rating.toString();
+                  },
+                ),
+              ],
+            ),
+            TextField(
                 controller: bookController.bookdescctrl,
                 keyboardType: TextInputType.multiline,
                 maxLines: 5,
@@ -99,7 +133,7 @@ class NewBookPage extends StatelessWidget {
               color: Colors.blueAccent,
               textColor: Colors.white,
               elevation: 15,
-              onPressed: _insertNewBookDialog,
+              onPressed: () => {insertNewBookDialog(bookrating)},
             ),
           ],
         ),
@@ -107,12 +141,20 @@ class NewBookPage extends StatelessWidget {
     );
   }
 
-  _onPictureSelection() async {
-     imageController.getImage();
+  _onPictureSelection() {
+    imageController.getImage();
   }
 
- 
-  void _insertNewBookDialog() {
-    print(imageController.image.path);
+  void insertNewBookDialog(String bookrating) {
+    String base64Image = base64Encode(imageController.image.readAsBytesSync());
+    Book newbook = Book(
+        title: bookController.booktitlectrl.text,
+        description: bookController.bookdescctrl.text,
+        type: bookController.selected.value,
+        base64Image: base64Image,
+        price: bookController.bookpricectrl.text,
+        rating: bookrating,
+        email: "slumberjer@gmail.com");
+    bookController.newBook(newbook);
   }
 }

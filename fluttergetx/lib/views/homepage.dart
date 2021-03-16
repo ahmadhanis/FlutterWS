@@ -34,7 +34,7 @@ class HomePage extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    'LibX',
+                    'MyBook',
                     style: TextStyle(
                         fontFamily: 'avenir',
                         fontSize: 32,

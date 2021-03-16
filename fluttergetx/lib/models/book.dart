@@ -7,7 +7,7 @@ String booksToJson(List<Book> data) =>
     json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class Book {
-  String title, bookid, description, type, price, rating;
+  String title, bookid, description, type, price, rating, base64Image,email;
 
   Book({
     this.title,
@@ -16,6 +16,8 @@ class Book {
     this.type,
     this.price,
     this.rating,
+    this.base64Image,
+    this.email,
   });
 
   final isFavorite = false.obs;
