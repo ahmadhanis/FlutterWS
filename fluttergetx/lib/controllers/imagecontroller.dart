@@ -10,22 +10,22 @@ class ImageController extends GetxController {
   static ImageController get to => Get.find<ImageController>();
 
   File image;
-  String  imagePath;
+  String imagePath;
   final _picker = ImagePicker();
 
   void getImage() async {
-    final pickedFile = await _picker.getImage(source: ImageSource.camera, maxHeight: 800, maxWidth: 800);
+    final pickedFile = await _picker.getImage(
+        source: ImageSource.camera, maxHeight: 800, maxWidth: 800);
 
     if (pickedFile != null) {
       image = File(pickedFile.path);
       _cropImage();
-      
-      
     } else {
       print('No image selected.');
     }
   }
-   Future<Null> _cropImage() async {
+
+  Future<Null> _cropImage() async {
     File croppedFile = await ImageCropper.cropImage(
         sourcePath: image.path,
         aspectRatioPresets: Platform.isAndroid
@@ -51,5 +51,4 @@ class ImageController extends GetxController {
       print(imagePath);
     }
   }
-
 }

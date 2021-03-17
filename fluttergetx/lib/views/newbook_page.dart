@@ -146,15 +146,72 @@ class NewBookPage extends StatelessWidget {
   }
 
   void insertNewBookDialog(String bookrating) {
-    String base64Image = base64Encode(imageController.image.readAsBytesSync());
-    Book newbook = Book(
-        title: bookController.booktitlectrl.text,
-        description: bookController.bookdescctrl.text,
-        type: bookController.selected.value,
-        base64Image: base64Image,
-        price: bookController.bookpricectrl.text,
-        rating: bookrating,
-        email: "slumberjer@gmail.com");
-    bookController.newBook(newbook);
+    Get.dialog(
+      AlertDialog(
+          title: new Text(
+            "Insert new book title '" +
+                bookController.booktitlectrl.text +
+                "' ?",
+            style: TextStyle(
+              color: Colors.black,
+            ),
+          ),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+          content: new Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Are you sure? ",
+                style: TextStyle(
+                  color: Colors.black,
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  new TextButton(
+                    child: new Text(
+                      "Yes",
+                      style: TextStyle(
+                        color: Colors.black,
+                      ),
+                    ),
+                    onPressed: () async {
+                      navigator.pop();
+                      String base64Image =
+                          base64Encode(imageController.image.readAsBytesSync());
+                      Book newbook = Book(
+                          title: bookController.booktitlectrl.text,
+                          description: bookController.bookdescctrl.text,
+                          type: bookController.selected.value,
+                          base64Image: base64Image,
+                          price: bookController.bookpricectrl.text,
+                          rating: bookrating,
+                          email: "slumberjer@gmail.com");
+                      Future<String> resp = bookController.newBook(newbook);
+                      bookController.dispose();
+                      print(resp);
+                      Get.back();
+                    },
+                  ),
+                  new TextButton(
+                    child: new Text(
+                      "No",
+                      style: TextStyle(
+                        color: Colors.black,
+                      ),
+                    ),
+                    onPressed: () {
+                      navigator.pop();
+                    },
+                  ),
+                ],
+              )
+            ],
+          )),
+      barrierDismissible: true,
+    );
   }
 }

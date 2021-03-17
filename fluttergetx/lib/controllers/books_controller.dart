@@ -79,14 +79,14 @@ class BooksController extends GetxController {
     }
   }
 
-  void newBook(book) async {
+  Future<String> newBook(book) async {
     try {
       isLoading(true);
       var resp = await RemoteServices.newBook(book);
       if (resp == "success") {
         fetchBooks();
       }
-      print(resp);
+      return resp;
     } finally {
       isLoading(false);
     }
