@@ -5,8 +5,8 @@ class RemoteServices {
   static var client = http.Client();
 
   static Future<List<Book>> fetchBooks() async {
-    var response =
-        await client.get('https://slumberjer.com/mylibrary/php/loadbooks.php');
+    var response = await client
+        .get(Uri.parse('https://slumberjer.com/mylibrary/php/loadbooks.php'));
     if (response.statusCode == 200) {
       if (response.body == "nodata") {
         return null;
@@ -22,8 +22,8 @@ class RemoteServices {
   }
 
   static Future<String> deleteBook(bookid) async {
-    var response = await client.post(
-        'https://slumberjer.com/mylibrary/php/deletebook.php',
+    var response = await client.post(Uri.parse(
+        'https://slumberjer.com/mylibrary/php/deletebook.php'),
         body: {"bookid": bookid});
     if (response.statusCode == 200) {
       var resp = response.body;
@@ -36,13 +36,13 @@ class RemoteServices {
 
   static Future<String> newBook(book) async {
     var response = await client
-        .post('https://slumberjer.com/mylibrary/php/insertbook.php', body: {
+        .post(Uri.parse('https://slumberjer.com/mylibrary/php/insertbook.php'), body: {
       "email": book.email,
       "booktitle": book.title,
       "booktype": book.type,
       "bookdesc": book.description,
-      "bookprice":book.price,
-      "bookrating":book.rating,
+      "bookprice": book.price,
+      "bookrating": book.rating,
       "encoded_string": book.base64Image,
     });
     if (response.statusCode == 200) {
